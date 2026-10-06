@@ -1,0 +1,19 @@
+{
+  "name": "한국뇌궁합연구소 · Korea Brain Matching Institute",
+  "short_name": "뇌궁합 BrainMatch",
+  "description": "그림 30장으로 보는 두 사람의 뇌 성향 / Compare brain tendencies with 30 pictures",
+  "id": "/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EAF0FF",
+  "theme_color": "#00164D",
+  "lang": "ko",
+  "categories": ["lifestyle", "entertainment"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
