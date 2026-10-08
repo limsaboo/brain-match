@@ -218,6 +218,14 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
 .adult{display:flex;align-items:center;gap:12px;margin:12px 0 0;font-size:18px;font-weight:900;line-height:1.5;color:#000}
 .adult input{width:30px;height:30px;accent-color:#0033CC;flex:0 0 auto}
 .foot a{color:#FFD400;text-decoration:underline}
+.ins{margin:8px 0 0;padding:0;list-style:none}
+.ins li{display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;font-size:16px;line-height:1.8;font-weight:900;color:#000}
+.ins li i{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-style:normal;font-size:17px;line-height:32px;text-align:center;margin-top:3px}
+.ins li span{flex:1;min-width:0}
+.ins li span b{color:var(--blue)}
+.kk{background:#FEE500;color:#000;border:3px solid #000}
+a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center}
+.more p{font-weight:900;color:#000;line-height:1.8}
 </style>
 </head>
 <body>
@@ -818,6 +826,7 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
     h += '</div>';
 
     h += '<div class="sec"><h2>이렇게 진행돼요</h2><ul class="steps"><li><i>1</i>그림 점수 주기</li><li><i>2</i>점수 레이더</li><li><i>3</i>링크로 초대</li><li><i>4</i>둘의 겹침</li></ul></div>';
+    h += installCard();
 
     h += '<div class="sec"><h2>왜 글이 아니라 그림일까요?</h2>' +
       '<p class="sub">한국뇌심리연구소의 BIPS 개발 원칙(그림 투사·이미지 기반 자기이해)을 적용했습니다.</p>' +
@@ -934,12 +943,14 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
       h += '<button class="btn red" data-act="pair">' + LN(esc(S.inv.nick || '상대') + '님과 둘의 결과 보기', 'See your combined result with ' + esc(S.inv.nick || 'them'), esc(S.inv.nick || '相手') + 'さんとの2人の結果を見る', { ru: 'Общий результат: ' + esc(S.inv.nick || 'партнёр'), uz: esc(S.inv.nick || 'Sherik') + ' bilan umumiy natija' }) + '</button>';
     } else {
       var link = inviteLink(S.hub, s, me.nick, me.age);
-      h += '<div class="card cy"><b class="t">그 사람에게 보내서 두 사람의 레이더를 겹쳐 보세요</b>' +
+      h += '<div class="card cy"><b class="t">' + (LANG === 'ko' ? '그 사람에게 보내서&nbsp;두&nbsp;사람의 레이더를 겹쳐 보세요' : '그 사람에게 보내서 두 사람의 레이더를 겹쳐 보세요') + '</b>' +
         '<p>링크를 받은 사람이 그림 30장에 점수를 주면 둘의 결과가 나옵니다.</p>' +
         '<input class="txt" id="lnk" readonly value="' + esc(link) + '">' +
         '<button class="btn red" data-act="copy">초대 링크 복사</button>' +
-        '<button class="btn blue" data-act="share">공유하기</button>' + ((LANG === 'ru' || LANG === 'uz') ? '<button class="btn" style="background:#229ED9;color:#fff" data-act="tg">Telegram</button>' : '') + '</div>';
+        '<button class="btn blue" data-act="share">공유하기</button>' + '<button class="btn kk" data-act="kcopy">' + LN('카톡에 붙여넣을 문구 복사', 'Copy message to paste in chat', 'チャット用メッセージをコピー', { ru: 'Скопировать сообщение для чата', uz: 'Chat uchun xabarni nusxalash' }) + '</button>' + ((LANG === 'ru' || LANG === 'uz') ? '<button class="btn" style="background:#229ED9;color:#fff" data-act="tg">Telegram</button>' : '') + '</div>';
     }
+    h += moreCard();
+    h += installCard();
     h += (S.group ? '' : '<button class="btn ghost" data-act="retry">다시 해보기</button>') + '<button class="btn ghost" data-act="home">처음으로</button></div>';
     return h;
   }
@@ -981,6 +992,7 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
     h += '<div class="card c1"><b class="t">근거와 한계</b><p style="font-size:15px">겹침률은 두 사람의 영역별 점수 차이의 평균을 100에서 뺀 값(100 − 점수 차이 합 ÷ 5)이며, 관계의 좋고 나쁨이나 미래를 예측하지 않습니다. 영역 설명의 근거 문헌은 개인 보고서의 문헌 목록과 같습니다.</p></div>';
     h += '<div class="note">재미로 보는 자기이해·오락 콘텐츠입니다. 의학적 진단이 아닙니다.</div>';
     h += '<div class="card cy"><b class="t">' + LN('뇌궁합 인증서 선물하기', 'Gift a Brain Match Certificate') + '</b><p>' + LN('레이더·유형 이름·요약이 담긴 카드에 한국뇌심리연구소 소장 인장을 찍어 드려요.', 'A card with the radar, type name and summary, stamped with the director\'s seal.') + '</p><button class="btn red" data-act="cert">' + LN('인증서 만들기', 'Make the certificate') + '</button></div>' + '<button class="btn blue" data-act="share">이 결과 공유하기</button>' + (g ? groupBtns(g) : '') + '<button class="btn ghost" data-act="home">처음으로</button></div>';
+    h += moreCard();
     return h;
   }
 
@@ -1224,6 +1236,33 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
     }
     if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function () { toast('링크를 복사했어요'); }, fb); } else { fb(); }
   }
+  var LINK_EBOOK = 'https://groble.im/kbrain', LINK_CHAT = 'https://open.kakao.com/o/sq64NuAi';
+  function moreCard() {
+    var h = '';
+    if (LANG === 'ko') {
+      h += '<div class="card c3 more"><b class="t">우리 이야기, 전자책으로 더 읽기</b>' +
+        '<p>한국뇌궁합연구소 전자책을 만나 보세요.</p>' +
+        '<a class="btn yellow" href="' + LINK_EBOOK + '" target="_blank" rel="noopener">전자책 보러 가기</a></div>';
+    }
+    if (LANG === 'ko' || LANG === 'en' || LANG === 'ja') {
+      h += '<div class="card c1 more"><b class="t">' + LN('모임·학교·단체에서 같이 해보고 싶다면', 'Want to do this with your group?', 'グループで体験したいなら') + '</b>' +
+        '<p>' + LN('모임, 학교, 유학원 단위로 함께 체험할 수 있어요. 편하게 메시지를 남겨 주세요.', 'Clubs, classes and study-abroad groups can try it together. Send us a message.', '学校・サークル・団体でも一緒に体験できます。お気軽にメッセージをどうぞ。') + '</p>' +
+        '<a class="btn blue" href="' + LINK_CHAT + '" target="_blank" rel="noopener">' + LN('단체 체험 문의하기', 'Ask about group sessions', '団体体験の問い合わせ') + '</a></div>';
+    }
+    return h;
+  }
+  var DEFERRED = null;
+  window.addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); DEFERRED = ev; try { var pb = document.getElementById('pwabtn'); if (pb) { pb.style.display = 'block'; } } catch (eP) { } });
+  function isStandalone() { try { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; } catch (eS) { return false; } }
+  function installCard() {
+    if (isStandalone()) { return ''; }
+    return '<div class="sec"><h2>' + LN('폰에 앱처럼 설치하기', 'Add it to your phone like an app', 'スマホにアプリとして追加', { ru: 'Добавить на телефон как приложение', uz: 'Telefonga ilova kabi qo‘shish' }) + '</h2>' +
+      '<div class="card c1"><ul class="ins">' +
+      '<li><i>1</i><span>' + LN('<b>안드로이드(크롬)</b>: 오른쪽 위 점 세 개(⋮)를 누르세요.', '<b>Android (Chrome)</b>: tap the three dots (⋮) at the top right.', '<b>Android(Chrome)</b>:右上の点3つ(⋮)をタップ。', { ru: '<b>Android (Chrome)</b>: нажмите три точки (⋮) вверху справа.', uz: '<b>Android (Chrome)</b>: yuqori o‘ngdagi uch nuqta (⋮) ni bosing.' }) + '</span></li>' +
+      '<li><i>2</i><span>' + LN('<b>"홈 화면에 추가"</b> 또는 <b>"앱 설치"</b>를 누르세요.', 'Tap <b>"Add to Home screen"</b> or <b>"Install app"</b>.', '<b>「ホーム画面に追加」</b>または<b>「アプリをインストール」</b>をタップ。', { ru: 'Выберите <b>«Добавить на главный экран»</b> или <b>«Установить приложение»</b>.', uz: '<b>«Bosh ekranga qo‘shish»</b> yoki <b>«Ilovani o‘rnatish»</b> ni bosing.' }) + '</span></li>' +
+      '<li><i>3</i><span>' + LN('<b>아이폰(사파리)</b>: 아래 공유 버튼 → "홈 화면에 추가".', '<b>iPhone (Safari)</b>: Share button → "Add to Home Screen".', '<b>iPhone(Safari)</b>:共有ボタン →「ホーム画面に追加」。', { ru: '<b>iPhone (Safari)</b>: кнопка «Поделиться» → «На экран Домой».', uz: '<b>iPhone (Safari)</b>: «Ulashish» tugmasi → «Bosh ekranga qo‘shish».' }) + '</span></li>' +
+      '</ul><button class="btn red" id="pwabtn" data-act="install" style="display:' + (DEFERRED ? 'block' : 'none') + '">' + LN('지금 설치하기', 'Install now', '今すぐ追加', { ru: 'Установить сейчас', uz: 'Hozir o‘rnatish' }) + '</button></div></div>';
+  }
   function shareText() { if (S.group) { return LN('우리 ' + S.group.n + '명의 뇌 성향을 그림으로 겹쳐 봤어요! 너도 해볼래?', 'We overlaid our brain tendencies with pictures! Want to try?', '私たち' + S.group.n + '人の脳傾向を絵で重ねてみたよ!あなたもやってみない?', { ru: 'Мы наложили наши мозговые профили друг на друга по картинкам! Хочешь попробовать?', uz: 'Miya moyilligimizni rasmlar orqali solishtirdik! Sen ham sinab ko‘rasanmi?' }); } return T('나는 「' + TYPES[typeKey(S.me.s)].name + '」 유형! 우리 둘의 뇌 성향도 그림으로 겹쳐 볼래?'); }
 
   function readG() {
@@ -1307,6 +1346,14 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
       track('share_tg');
       var url2 = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age);
       try { window.open('https://t.me/share/url?url=' + encodeURIComponent(url2) + '&text=' + encodeURIComponent(shareText()), '_blank'); } catch (eT) { copyText(url2); }
+      return;
+    } else if (a === 'kcopy') {
+      track('share_kcopy');
+      var url3 = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age);
+      copyText(shareText() + '\n' + url3); return;
+    } else if (a === 'install') {
+      track('pwa_install_click');
+      if (DEFERRED) { try { DEFERRED.prompt(); } catch (eI) { } DEFERRED = null; } else { toast(LN('위 순서대로 눌러 주세요', 'Please follow the steps above', '上の手順でタップしてください', { ru: 'Следуйте шагам выше', uz: 'Yuqoridagi qadamlarga amal qiling' })); }
       return;
     } else if (a === 'share') {
       track('share_click');
