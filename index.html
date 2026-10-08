@@ -31,6 +31,8 @@ svg{display:block}
 .top{gap:8px}.top .nm{min-width:0;font-size:14px}.top button:last-child{padding:10px 9px;font-size:14px}
 html[lang="ru"] body *,html[lang="uz"] body *{overflow-wrap:break-word;hyphens:auto}
 html[lang="ru"] .card svg,html[lang="uz"] .card svg{overflow:visible}
+html[lang="ko"] .top .nt{white-space:nowrap}
+@media (max-width:440px){.top .nm small{display:none !important}}
 html[lang="ru"] .top *,html[lang="uz"] .top *{overflow-wrap:normal;hyphens:manual}
 html[lang="ru"] .top .nm small,html[lang="uz"] .top .nm small{display:none}
 html[lang="ru"] .top .nm,html[lang="uz"] .top .nm{font-size:13px;line-height:1.3}
@@ -485,6 +487,7 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
   /* 언어: 저장된 선택 > 기기 언어. (이 기기의 localStorage에만 저장) */
   var LANG = 'ko';
   try { var sl = localStorage.getItem('kbm_lang'); if (sl === 'ko' || sl === 'en' || sl === 'ja' || sl === 'ru' || sl === 'uz') { LANG = sl; } else { var nl = (navigator.language || 'ko').toLowerCase(); LANG = (nl.indexOf('ko') === 0) ? 'ko' : ((nl.indexOf('ja') === 0) ? 'ja' : ((nl.indexOf('ru') === 0) ? 'ru' : ((nl.indexOf('uz') === 0) ? 'uz' : 'en'))); } } catch (eL) { }
+  try { var qm = /[?&]lang=(ko|en|ja|ru|uz)(&|$)/.exec(location.search); if (qm) { LANG = qm[1]; try { localStorage.setItem('kbm_lang', LANG); } catch (eQ2) { } } } catch (eQ) { }
   function LN(ko, en, ja) {
     if (LANG === 'en') { return en; }
     if (LANG === 'ja') { if (ja !== undefined) { return ja; } if (typeof ko === 'string') { return (JA_LN[ko] !== undefined) ? JA_LN[ko] : T(ko); } return ko; }
