@@ -31,7 +31,7 @@ svg{display:block}
 .top{gap:8px}.top .nm{min-width:0;font-size:14px}.top button:last-child{padding:10px 9px;font-size:14px}
 html[lang="ru"] body *,html[lang="uz"] body *{overflow-wrap:break-word;hyphens:auto;hyphenate-limit-chars:8 4 4}
 html[lang="ru"] .card svg,html[lang="uz"] .card svg{overflow:visible}
-html[lang="ko"] .top .nt{white-space:nowrap}
+html[lang="ko"] .top .nt{white-space:normal;text-wrap:balance}
 @media (max-width:440px){.top .nm small{display:none !important}}
 html[lang="ru"] .top *,html[lang="uz"] .top *{overflow-wrap:normal;hyphens:manual}
 html[lang="ru"] .top .nm small,html[lang="uz"] .top .nm small{display:none}
@@ -57,7 +57,7 @@ html .steps{display:grid;grid-template-columns:1fr 1fr}
 html .steps li{font-size:14px}
 html .fr{flex-wrap:wrap;justify-content:center}html .fr .fi{margin:0 auto}html .fr .ft{flex:1 1 100%}
 }
-html[lang="ja"] .top .nm{font-size:13px}html[lang="ja"] .top .nm{white-space:normal}html[lang="ja"] .top .nt{white-space:nowrap}
+html[lang="ja"] .top .nm{font-size:13px}html[lang="ja"] .top .nm{white-space:normal}html[lang="ja"] .top .nt{white-space:normal;text-wrap:balance}
 html[lang="ja"] .type h2{font-size:26px}html[lang="ja"] .two .type h2{font-size:19px}
 html[lang="ja"] body{font-family:'Noto Sans JP','Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Meiryo','Noto Sans KR',sans-serif}
 .top .nm small{display:block;color:var(--yellow);font-size:11px;letter-spacing:.4px;font-weight:900}
@@ -545,6 +545,7 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
     } catch (x) { }
   }
   function balanceShort() {
+    try { var nt = document.querySelectorAll('#top .nt'), q; for (q = 0; q < nt.length; q++) { if (nt[q].textContent.indexOf('\u200B') < 0) { nt[q].textContent = nt[q].textContent.replace('性研', '性\u200B研').replace('합연', '합\u200B연'); } } } catch (z) { }
     try { var els = document.querySelectorAll('#app p,#app li,#app small,#app span,#app b,#app div.note,#foot p,#foot li'), e; for (e = 0; e < els.length; e++) { if (els[e].textContent.length <= 56 && getComputedStyle(els[e]).display !== 'inline') { els[e].style.textWrap = 'balance'; } } } catch (x) { }
   }
   function translateDOM() {
@@ -554,7 +555,7 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
       if (!roots[r]) { continue; }
       w = document.createTreeWalker(roots[r], NodeFilter.SHOW_TEXT, null);
       while ((n = w.nextNode())) { if (/[가-힣]/.test(n.nodeValue) && n.parentNode.tagName !== 'SCRIPT') { n.nodeValue = T(n.nodeValue); } }
-      if (LANG === 'ja') { w = document.createTreeWalker(roots[r], NodeFilter.SHOW_TEXT, null); while ((n = w.nextNode())) { if (/\d[枚人点分歳個回位組％%件]/.test(n.nodeValue)) { n.nodeValue = n.nodeValue.replace(/(\d)([枚人点分歳個回位組％%件])/g, '$1\u2060$2'); } } }
+      if (LANG === 'ja') { w = document.createTreeWalker(roots[r], NodeFilter.SHOW_TEXT, null); while ((n = w.nextNode())) { if (/\d[枚人点分歳個回位組％%件]/.test(n.nodeValue)) { n.nodeValue = n.nodeValue.replace(/(\d)([枚人点分歳個回位組％%件])/g, '$1\u2060$2').replace(/(絵)(?=\d)/g, '$1\u2060'); } } }
       els = roots[r].querySelectorAll('[alt],[aria-label],[placeholder],[title]');
       for (e = 0; e < els.length; e++) { for (a = 0; a < at.length; a++) { var v = els[e].getAttribute(at[a]); if (v && /[가-힣]/.test(v)) { els[e].setAttribute(at[a], T(v)); } } }
     }
