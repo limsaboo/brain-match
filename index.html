@@ -869,7 +869,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     AGES.forEach(function (a, i) { h += '<button data-act="age" data-v="' + i + '"' + (S.age === i ? ' class="on"' : '') + '>' + a + '</button>'; });
     h += '<button data-act="age" data-v="9"' + (S.age === 9 ? ' class="on"' : '') + '>선택 안 함</button></div></div>';
     h += (S.hub === 'parent' ? '<div class="note" style="border-color:#E00000">별명 칸에는 실명 등 개인정보를 쓰지 마세요. 결과로 가족을 평가하거나 비교하지 말고, 대화의 계기로만 사용해 주세요.</div>' : '') +
-      '<div class="note">이 서비스는 만 18세 이상을 위한 자기이해·오락용 콘텐츠입니다. 본 검사는 의학적 진단이 아니며, 중요한 결정의 근거로 쓰지 마세요. (총 30장)</div>' +
+      '<div class="note">만 18세 이상 · 그림 30장</div>' +
       '<label class="adult"><input type="checkbox" id="adult"' + (S.adult ? ' checked' : '') + '> 만 18세 이상입니다</label>' +
       '<button class="btn red" data-act="begin">시작하기</button>' +
       '<button class="btn ghost" data-act="home">처음으로</button></div>';
@@ -894,6 +894,70 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       '<div class="meter"><i style="width:' + v + '%;background:' + AX[k].col + '"></i><u style="left:35%"></u><u style="left:65%"></u><em style="left:' + ref + '%"></em></div>' +
       '<div class="scale"><span>0</span><span>50</span><span>100</span></div>' +
       '<div class="refl">평균 ' + ref + '점 · <b style="color:' + (d >= 0 ? '#0033CC' : '#E00000') + '">' + sgn(d) + '점</b> · 상위 ' + topPct(v, ref) + '%(예상)</div></div>';
+  }
+
+
+  /* ---------- 이상적 파트너 프로필 (연인·부부 허브, 재미로 보는 참고용) ---------- */
+  function idealOf(s) {
+    return s.map(function (v) {
+      var base = v <= 40 ? v + 40 : (v <= 60 ? v + 20 : (v <= 75 ? v + 5 : v + 1));
+      return Math.min(98, Math.max(38, Math.round(base)));
+    });
+  }
+  var IDEAL_CD = [
+    { i: '🧭', t: '순서를 잡아 주는 분', d: '할 일과 일정을 차근차근 정리해 주는 분입니다. 함께 있으면 결정이 한결 가벼워지고 약속이 흐트러지는 일이 줄어듭니다.' },
+    { i: '💞', t: '마음을 먼저 살펴 주는 분', d: '표정과 분위기를 읽고 마음을 먼저 물어봐 주는 분입니다. 함께 있으면 말하기 어려운 이야기도 꺼내기 쉬워집니다.' },
+    { i: '🚀', t: '새로운 시도에 함께 나서 주는 분', d: '새로운 일에 설레고 먼저 해 보자고 말해 주는 분입니다. 함께 있으면 일상에 작은 도전이 늘어납니다.' },
+    { i: '🏡', t: '일상의 리듬을 지켜 주는 분', d: '익숙한 루틴을 꾸준히 지키는 분입니다. 함께 있으면 마음이 편안해지고 생활이 안정됩니다.' },
+    { i: '✨', t: '새로운 생각을 꺼내 주는 분', d: '엉뚱한 아이디어와 다른 시각을 건네는 분입니다. 함께 있으면 대화에 웃음과 놀라움이 늘어납니다.' }];
+  var IDEAL_SH = [
+    { i: '📋', t: '계획을 함께 세우는 분', d: '계획과 약속을 중요하게 여기는 분입니다. 같은 강점은 서로를 믿게 하는 바탕이 되지만 결정이 길어질 수 있어 기한을 함께 정하면 좋습니다.' },
+    { i: '🌊', t: '마음을 나누기 쉬운 분', d: '감정을 말로 나누는 데 익숙한 분입니다. 같은 강점은 서로를 빨리 이해하게 하지만 감정이 함께 커질 수 있어 잠시 쉬어 가는 규칙이 도움이 됩니다.' },
+    { i: '🔥', t: '도전을 함께 즐기는 분', d: '성취와 새로움에서 힘을 얻는 분입니다. 같은 강점은 함께 목표를 이루는 즐거움이 되지만 쉬는 시간도 함께 정해 두면 좋습니다.' },
+    { i: '🌿', t: '편안한 리듬이 비슷한 분', d: '익숙한 일상에서 편안함을 느끼는 분입니다. 같은 강점은 생활의 마찰을 줄이지만 가끔 새로운 경험을 섞으면 더 좋습니다.' },
+    { i: '🎨', t: '상상을 함께 나누는 분', d: '상상하고 이야기를 만드는 것을 좋아하는 분입니다. 같은 강점은 대화를 풍부하게 하지만 현실 일정은 따로 챙기면 좋습니다.' }];
+  var IDEAL_WH = [
+    '독서 모임, 토론 모임, 강연·강의 수강, 보드게임 모임처럼 순서와 규칙이 있는 자리에서 대화를 시작해 보세요.',
+    '전시회, 음악 공연, 요리 클래스, 봉사활동처럼 마음을 나누기 쉬운 자리에서 대화를 시작해 보세요.',
+    '러닝·등산·수영 모임, 새로운 취미 체험 클래스, 자기계발 모임처럼 도전하는 자리에서 대화를 시작해 보세요.',
+    '산책 모임, 전통문화 체험, 악기·서예·자수 같은 꾸준한 취미반처럼 편안한 리듬의 자리에서 대화를 시작해 보세요.',
+    '미술·사진 전시, 글쓰기·작곡 모임, 여행 소모임, 영화·연극 동호회처럼 상상을 나누는 자리에서 대화를 시작해 보세요.'];
+  function idealHtml(s) {
+    var id = idealOf(s), r = rankOf(s), weak = r[4], strong = r[0], k, h = '', ord = [0, 1, 2, 3, 4].sort(function (a, b) { return (s[a] - s[b]) || (a - b); }), tr = [], used = {};
+    h += '<div class="card c3"><b class="t">이상적 파트너 프로필</b><p style="font-size:15px">내 점수와 나에게 균형을 줄 수 있는 점수 예시입니다.</p>';
+    h += '<p style="font-size:15px"><span class="lab" style="background:#0033CC">파랑 · 나</span> <span class="lab" style="background:#B45309">노랑 · 이상적 파트너</span></p>';
+    for (k = 0; k < 5; k++) {
+      var df = id[k] - s[k];
+      h += '<div style="margin:8px 0 4px"><div style="display:flex;justify-content:space-between;font-weight:900"><span style="color:' + AX[k].col + '">' + AX[k].n + '</span><span>' + s[k] + ' / ' + id[k] + ' (' + (df > 0 ? '+' : '') + df + ')</span></div>' +
+        '<div style="height:12px;background:#E5E7EB;border-radius:8px;overflow:hidden;margin:2px 0"><div style="height:12px;width:' + s[k] + '%;background:#0033CC"></div></div>' +
+        '<div style="height:12px;background:#E5E7EB;border-radius:8px;overflow:hidden"><div style="height:12px;width:' + id[k] + '%;background:#FFD400"></div></div></div>';
+    }
+    h += '</div>';
+    tr.push(IDEAL_CD[ord[0]]); used[ord[0]] = 1;
+    ord.forEach(function (x) { if (tr.length < 4 && !used[x]) { tr.push(IDEAL_CD[x]); used[x] = 1; } });
+    tr.push(IDEAL_SH[strong]);
+    h += '<div class="card c4"><b class="t">이상적 파트너의 5가지 특성</b>';
+    tr.forEach(function (x) { h += '<p style="margin:10px 0 0"><b>' + x.i + ' ' + x.t + '</b><br><span style="font-size:16px">' + x.d + '</span></p>'; });
+    h += '</div>';
+    h += '<div class="card c5"><b class="t">이런 곳에서 만날 수 있어요</b><p>' + IDEAL_WH[weak] + '</p><p style="font-size:15px">직업이나 성격을 단정하는 내용이 아니라, 대화를 시작하기 좋은 자리를 안내하는 참고 자료입니다.</p></div>';
+    h += '<button class="btn ghost" data-act="saveimg">보고서를 그림으로 저장</button>';
+    return h;
+  }
+  function saveImgs() {
+    var run = function () {
+      var els = Array.prototype.slice.call(document.querySelectorAll('#wrap .sec > .card, #wrap .sec > .type, #wrap .sec > .rep'));
+      var blobs = [], i = 0;
+      var next = function () {
+        if (i >= els.length) { var j = blobs.length - 1, dl = function () { if (j < 0) { return; } var u = URL.createObjectURL(blobs[j]), a = document.createElement('a'); a.href = u; a.download = 'brain-report_' + (j + 1) + '_' + blobs.length + '.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function () { URL.revokeObjectURL(u); j--; dl(); }, 500); }; dl(); toast('그림 ' + blobs.length + '장을 저장합니다'); return; }
+        window.html2canvas(els[i], { scale: 2, backgroundColor: '#EAF0FF' }).then(function (c) { c.toBlob(function (b) { blobs.push(b); i++; next(); }); });
+      };
+      next();
+    };
+    if (window.html2canvas) { run(); return; }
+    var sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    sc.onload = run; sc.onerror = function () { toast('그림 저장 기능을 불러오지 못했어요. 인터넷 연결을 확인해 주세요'); };
+    document.head.appendChild(sc);
   }
 
   function vResult() {
@@ -933,10 +997,10 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     }
     h += '<div class="card c2"><b class="t">끌리기 쉬운 상대</b><p>' + esc(t.like) + '</p></div>';
     h += '<div class="card c3"><b class="t">부딪히기 쉬운 상황</b><p>' + esc(t.clash) + '</p></div>';
+    if (S.hub === 'couple' || S.hub === 'spouse') { h += idealHtml(s); }
     h += '<div class="card cy"><b class="t">상대에게 이렇게 말해 보세요</b><div class="sayb">"' + esc(t.say) + '"</div></div>';
     h += '<div class="card c1"><details><summary><b>자료 보기 (참고 문헌)</b></summary><p style="font-size:15px">점수는 그림 30장에 준 평점(1~5점)을 영역별로 더해 0~100점으로 바꾼 값이며 뇌 활동을 측정한 값이 아닙니다. ' + (ref.real ? LN('연령대 평균은 이 서비스 참여자 ' + ref.n + '명의 실제 평균입니다. ', 'The age-group average is the real average of ' + ref.n + ' participants of this service. ', '年代平均は、このサービスの参加者' + ref.n + '人の実際の平均です。 ', { ru: 'Среднее по возрастной группе — реальное среднее по ' + ref.n + ' участникам сервиса. ', uz: 'Yosh guruhi o‘rtachasi — xizmatning ' + ref.n + ' ishtirokchisi bo‘yicha haqiqiy o‘rtacha. ' }) : '연령대 평균은 성격 발달 연구의 일반 경향을 바탕으로 계산한 시뮬레이션 추정값입니다. ') + '영역 이름과 뇌 이야기는 아래 문헌의 일반적인 내용을 빌려 쉽게 풀었습니다. 영역 구성과 그림-영역 연결은 연구소의 설계안이며 표준화 검증을 거친 척도가 아닙니다 [6].</p><ol class="refs">';
     h += '</ol></details></div>';
-    h += '<div class="note">재미로 보는 자기이해·오락 콘텐츠입니다. 의학적 진단이 아닙니다.</div>';
     if (S.group) {
       h += '<button class="btn red" data-act="gback">' + LN('같이 한 결과로 돌아가기', 'Back to the group result') + '</button>';
     } else if (S.inv) {
@@ -965,7 +1029,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     var pct = overlap(a.s, b.s), ta = TYPES[typeKey(a.s)], tb = TYPES[typeKey(b.s)];
     h += '<div class="sec"><div class="rep">' + logoSvg(44) + '<div><small>한국뇌궁합연구소 · 두 사람 분석 보고서</small><b>' + esc(an) + ' × ' + esc(bn) + '</b></div></div>';
     h += '<div class="two">' + miniType(g ? LN('1번째 사람', 'Person 1') : T('초대한 분'), a.nick, a.s) + miniType(g ? LN('2번째 사람', 'Person 2') : T('나'), b.nick, b.s) + '</div>';
-    h += '<div class="card c2"><div class="pct">' + donutSvg(pct) + '<div><b>' + overlapLabel(pct) + '</b><span style="font-size:15px;display:block;line-height:1.7">점수 패턴 겹침률. 정답이나 궁합 점수가 아니라 두 사람의 그림 선택이 얼마나 겹치는지입니다.</span></div></div><p style="margin-top:8px">' + esc(overlapLine(pct)) + '</p></div>';
+    h += '<div class="card c2"><div class="pct">' + donutSvg(pct) + '<div><b>' + overlapLabel(pct) + '</b><span style="font-size:15px;display:block;line-height:1.7">점수 패턴 겹침률. 두 사람의 그림 선택이 얼마나 겹치는지입니다.</span></div></div><p style="margin-top:8px">' + esc(overlapLine(pct)) + '</p></div>';
     h += '<div class="card c1"><b class="t">두 사람의 뇌 성향 레이더</b>' +
       radarSvg([{ v: a.s, col: '#0033CC', fill: 'rgba(0,51,204,.22)', dot: '#0033CC' }, { v: b.s, col: '#E00000', fill: 'rgba(224,0,0,.2)', dot: '#E00000' }], true) +
       '<p style="font-size:15px"><span class="lab same" style="background:#0033CC">' + esc(an) + '</span> <span class="lab" style="background:#E00000">' + esc(bn) + '</span> (숫자는 ' + esc(an) + ' · ' + esc(bn) + ' 순서)</p></div>';
@@ -990,7 +1054,6 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       '<div class="sayb">' + esc(an) + ': "' + esc(ta.say) + '"</div><div class="sayb">' + esc(bn) + ': "' + esc(tb.say) + '"</div></div>';
     h += '<div class="card c3"><b class="t">이번 주 둘이 해 볼 미션</b><div class="sayb">' + esc(AX[weakest].tip) + '</div></div>';
     h += '<div class="card c1"><b class="t">근거와 한계</b><p style="font-size:15px">겹침률은 두 사람의 영역별 점수 차이의 평균을 100에서 뺀 값(100 − 점수 차이 합 ÷ 5)이며, 관계의 좋고 나쁨이나 미래를 예측하지 않습니다. 영역 설명의 근거 문헌은 개인 보고서의 문헌 목록과 같습니다.</p></div>';
-    h += '<div class="note">재미로 보는 자기이해·오락 콘텐츠입니다. 의학적 진단이 아닙니다.</div>';
     h += '<div class="card cy"><b class="t">' + LN('뇌궁합 인증서 선물하기', 'Gift a Brain Match Certificate') + '</b><p>' + LN('레이더·유형 이름·요약이 담긴 카드에 한국뇌심리연구소 소장 인장을 찍어 드려요.', 'A card with the radar, type name and summary, stamped with the director\'s seal.') + '</p><button class="btn red" data-act="cert">' + LN('인증서 만들기', 'Make the certificate') + '</button></div>' + '<button class="btn blue" data-act="share">이 결과 공유하기</button>' + (g ? groupBtns(g) : '') + '<button class="btn ghost" data-act="home">처음으로</button></div>';
     h += moreCard();
     return h;
@@ -1017,7 +1080,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       AGES.forEach(function (a, n) { h += '<option value="' + n + '"' + (g.people[i].age === n ? ' selected' : '') + '>' + a + '</option>'; });
       h += '<option value="9"' + (g.people[i].age === 9 ? ' selected' : '') + '>' + LN('선택 안 함', 'Prefer not to say') + '</option></select></div>';
     }
-    h += '<div class="note">' + LN('이 서비스는 만 18세 이상을 위한 자기이해·오락용 콘텐츠이며 의학적 진단이 아닙니다. 별명에 실명 등 개인정보를 쓰지 마세요.', 'For adults 18+. Self-understanding entertainment, not a medical diagnosis. Please do not use real names as nicknames.') + '</div>' +
+    h += '<div class="note">' + LN('만 18세 이상 · 별명에 실명 등 개인정보를 쓰지 마세요.', 'Adults 18+ · Please do not use real names as nicknames.') + '</div>' +
       '<label class="adult"><input type="checkbox" id="gadult"' + (S.adult ? ' checked' : '') + '> ' + LN('모두 만 18세 이상입니다', 'Everyone here is 18 or older') + '</label>' +
       '<button class="btn red" data-act="gstart">' + LN('시작하기', 'Start') + '</button><button class="btn ghost" data-act="home">' + LN('처음으로', 'Back to start') + '</button></div>';
     return h;
@@ -1039,7 +1102,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     function pn(q) { return esc(nm[q[0]]) + ' × ' + esc(nm[q[1]]); }
     h += '<div class="sec"><div class="rep">' + logoSvg(44) + '<div><small>' + LN('한국뇌궁합연구소 · 세 사람 분석 보고서', 'Korea Brain Matching Institute · 3-person report') + '</small><b>' + esc(nm[0]) + ' × ' + esc(nm[1]) + ' × ' + esc(nm[2]) + '</b></div></div>';
     for (i = 0; i < 3; i++) { h += '<div style="margin-top:8px">' + miniType(LN((i + 1) + '번째 사람', 'Person ' + (i + 1), (i + 1) + '人目', { ru: (i + 1) + '-й участник', uz: (i + 1) + '-ishtirokchi' }), nm[i], r[i].s) + '</div>'; }
-    h += '<div class="card c2"><div class="pct">' + donutSvg(tot) + '<div><b>' + LN('세 사람 평균 겹침', 'Average overlap of the three') + '</b><span style="font-size:15px;display:block;line-height:1.7">' + LN('세 쌍의 점수 패턴 겹침률 평균입니다. 정답이나 궁합 점수가 아닙니다.', 'The average pattern overlap of the three pairs. Not a right answer or a compatibility score.') + '</span></div></div></div>';
+    h += '<div class="card c2"><div class="pct">' + donutSvg(tot) + '<div><b>' + LN('세 사람 평균 겹침', 'Average overlap of the three') + '</b><span style="font-size:15px;display:block;line-height:1.7">' + LN('세 쌍의 점수 패턴 겹침률 평균입니다.', 'The average pattern overlap of the three pairs.') + '</span></div></div></div>';
     h += '<div class="card c1"><b class="t">' + LN('세 사람의 뇌 성향 레이더', 'Brain-tendency radar of the three') + '</b>' +
       radarSvg(r.map(function (x, n) { return { v: x.s, col: PCOL[n], fill: PFILL[n], dot: PCOL[n] }; }), false) +
       '<p style="font-size:15px">' + r.map(function (x, n) { return '<span class="lab" style="background:' + PCOL[n] + '">' + esc(x.nick) + '</span>'; }).join(' ') + '</p></div>';
@@ -1071,7 +1134,6 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     for (i = 0; i < 3; i++) { h += '<div class="sayb">' + esc(nm[i]) + ': "' + esc(TYPES[typeKey(r[i].s)].say) + '"</div>'; }
     h += '</div><div class="card c3"><b class="t">' + LN('이번 주 셋이 해 볼 미션', 'This week\'s mission for the three of you') + '</b><div class="sayb">' + esc(AX[weakest].tip) + '</div></div>';
     h += '<div class="card c1"><b class="t">' + LN('근거와 한계', 'Basis and limits') + '</b><p style="font-size:15px">' + LN('겹침률은 두 사람의 영역별 점수 차이의 평균을 100에서 뺀 값입니다. 세 사람은 세 쌍을 각각 계산해 평균을 냅니다. 오락용 계산이며 관계의 좋고 나쁨을 뜻하지 않습니다.', 'Overlap is 100 minus the average score gap across the five areas. For three people each of the three pairs is calculated and averaged. It is for fun and does not say a relationship is good or bad.') + '</p></div>';
-    h += '<div class="note">' + LN('재미로 보는 자기이해·오락 콘텐츠입니다. 의학적 진단이 아닙니다.', 'Self-understanding entertainment for fun. Not a medical diagnosis.') + '</div>';
     h += '<div class="card cy"><b class="t">' + LN('뇌궁합 인증서 선물하기', 'Gift a Brain Match Certificate') + '</b><p>' + LN('레이더·유형 이름·요약이 담긴 카드에 한국뇌심리연구소 소장 인장을 찍어 드려요.', 'A card with the radar, type name and summary, stamped with the director\'s seal.') + '</p><button class="btn red" data-act="cert">' + LN('인증서 만들기', 'Make the certificate') + '</button></div>' + '<button class="btn blue" data-act="share">' + LN('이 결과 공유하기', 'Share this result') + '</button>' + groupBtns(g) + '<button class="btn ghost" data-act="home">' + LN('처음으로', 'Back to start') + '</button></div>';
     return h;
   }
@@ -1162,7 +1224,6 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     o += '<g transform="translate(270 522) rotate(-9) scale(.92)" opacity=".92"><circle r="30" fill="none" stroke="#D00000" stroke-width="2.6"/><circle r="25.5" fill="none" stroke="#D00000" stroke-width="1"/>' +
       '<path id="sealp" d="M0,-18.5 a18.5,18.5 0 1,1 -0.01,0" fill="none"/><text font-size="6.6" font-weight="900" fill="#D00000" font-family="' + CFONT + '"><textPath xlink:href="#sealp" href="#sealp" textLength="106" lengthAdjust="spacing">' + LN('한국뇌심리연구소 · 소장인 ·', 'KBPI · DIRECTOR · SEAL ·') + '</textPath></text>' +
       '<text y="-1" text-anchor="middle" font-size="9.6" font-weight="900" fill="#D00000" font-family="' + CFONT + '">' + LN('임찬우', 'C. LIM') + '</text><text y="10" text-anchor="middle" font-size="8.6" font-weight="900" fill="#D00000" font-family="' + CFONT + '">' + LN('印', 'SEAL') + '</text></g>';
-        LN(['재미로 보는 기념 카드이며', '공식 자격·의학적 진단이 아닙니다.'], ['A keepsake for fun.', 'Not an official qualification or diagnosis.'], ['楽しむための記念カードです。', '公的資格・医学的診断ではありません。'], { ru: ['Памятная карточка для развлечения.', 'Не квалификация, не диагноз.'], uz: ['Ko‘ngil ochish uchun esdalik.', 'Malaka yoki tashxis emas.'] }).forEach(function (t, q) { o += '<text x="152" y="' + (545 + q * 9.5) + '" text-anchor="middle" font-size="7.8" font-weight="700" fill="#555" font-family="' + CFONT + '">' + esc(t) + '</text>'; });
     if (gk && CIMG[gk]) { o += (m.n === 3 ? im(gk, 62, 567, 236, 118) : im(gk, 54, 557, 252, 126)); }
     o += '</svg>';
     return o;
@@ -1275,6 +1336,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     ad = document.getElementById('gadult'); if (ad) { S.adult = !!ad.checked; }
   }
   function act(a, v) {
+    if (a === 'saveimg') { saveImgs(); return; }
     if (a === 'cert') {
       S.screen = 'cert'; track('cert_open');
     } else if (a === 'certback') {
