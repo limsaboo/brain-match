@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#FFD400">
+<title>뇌궁합 관제실</title>
+<style>
+:root{--blue:#0033CC;--red:#E00000;--yel:#FFD400;--grn:#007A33;--pur:#6A1B9A;--ink:#000;--bg:#FFF8CC}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:700 17px/1.9 'Noto Sans KR',sans-serif;padding:14px 14px 60px;word-break:keep-all}
+h1{font-size:26px;margin:6px 0 4px;font-weight:900}h2{font-size:21px;margin:0 0 10px;font-weight:900}
+.card{background:#fff;border:4px solid #000;border-radius:16px;padding:16px;margin:0 0 16px}
+.k{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kp{border:3px solid #000;border-radius:12px;padding:10px 12px;text-align:center;line-height:1.5}
+.kp b{display:block;font-size:30px;font-weight:900}.kp span{font-size:14px;font-weight:800}
+.bar{display:flex;align-items:center;gap:8px;margin:6px 0;line-height:1.4}.bar .l{width:92px;flex:none;font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .t{flex:1;background:#eee;border:2px solid #000;border-radius:8px;height:24px;overflow:hidden}.bar .f{height:100%}.bar .v{width:92px;flex:none;text-align:right;font-size:14px;font-weight:900}
+table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.5}th,td{border-bottom:2px solid #000;padding:7px 4px;text-align:center}th{background:var(--yel);font-weight:900}td:first-child,th:first-child{text-align:left}
+input,select,button{font:900 17px 'Noto Sans KR',sans-serif;border:3px solid #000;border-radius:12px;padding:12px;width:100%;margin:6px 0}
+button{background:var(--blue);color:#fff}button.r{background:var(--red)}button.g{background:var(--grn)}
+.ins{border-left:10px solid var(--red);padding:8px 12px;margin:8px 0;background:#FFE3E3;line-height:1.7;font-size:16px}.ins.ok{border-color:var(--grn);background:#DFF6E6}
+.heat{display:grid;grid-template-columns:26px repeat(24,minmax(0,1fr));gap:2px;font-size:9px;line-height:1.2}.heat div{aspect-ratio:1;border-radius:3px;text-align:center}
+.tabs{display:flex;gap:6px;margin:8px 0}.tabs button{margin:0;padding:8px;font-size:15px}
+html,body{overflow-x:hidden;max-width:100%}.card{overflow:hidden}td,th,code,pre,small{overflow-wrap:anywhere}small{font-weight:700;font-size:13px;display:block;line-height:1.6}code{word-break:break-all;font-size:13px}
+</style></head><body>
+<h1>🧠 뇌궁합 관제실</h1><small>한국뇌궁합연구소 · 익명 통계(동의자만) · 시간은 한국시간</small>
+<div id="app"></div>
+<script>
+var U='https://grxqfaeznqqohnlltged.supabase.co',K='sb_publishable_Sgv6BVPo1dOnVICcX1tfzA_gf7T5Z4I';
+var APP='https://limsaboo.github.io/brain-match/';
+var A=document.getElementById('app'),days=30,D=null;
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}}
+function rpc(fn,b){return fetch(U+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()})}
+function E(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function pct(a,b){return b?Math.round(a*1000/b)/10:0}
+var COL=['#0033CC','#E00000','#007A33','#6A1B9A','#E65100','#C2185B','#00838F','#827700'];
+function bars(rows,lab,val,tot){var m=Math.max.apply(null,rows.map(function(r){return r[val]}).concat([1]));return rows.map(function(r,i){return '<div class="bar"><div class="l">'+E(r[lab])+'</div><div class="t"><div class="f" style="width:'+(r[val]*100/m)+'%;background:'+COL[i%8]+'"></div></div><div class="v">'+r[val]+(tot?' ('+pct(r[val],tot)+'%)':'')+'</div></div>'}).join('')||'<small>아직 자료가 없어요</small>'}
+function login(msg){var h=(location.hash.match(/s=([^&]+)/)||[])[1];
+ A.innerHTML='<div class="card"><h2>'+(h?'처음 비밀번호 정하기':'관제실 로그인')+'</h2>'+(msg?'<div class="ins">'+E(msg)+'</div>':'')+'<input id="pw" type="password" placeholder="'+(h?'새 비밀번호 (6자 이상)':'비밀번호')+'" autocomplete="'+(h?'new-password':'current-password')+'"><button id="go">'+(h?'비밀번호 정하고 시작':'들어가기')+'</button><small>비밀번호는 이 폰에만 저장되고, 5번 틀리면 10분간 잠겨요.</small></div>';
+ document.getElementById('go').onclick=function(){var p=document.getElementById('pw').value;if(p.length<6){login('6자 이상 입력해 주세요');return}
+  if(h){rpc('kbm_claim',{setup:decodeURIComponent(h),pass:p}).then(function(r){if(r&&r.ok){ls('kbm_lab_pw',p);history.replaceState(null,'',location.pathname);load()}else login('설정 링크가 이미 사용됐거나 올바르지 않아요: '+JSON.stringify(r))})}
+  else{ls('kbm_lab_pw',p);load()}}}
+function load(){var p=ls('kbm_lab_pw');if(!p){login();return}A.innerHTML='<div class="card">불러오는 중…</div>';
+ rpc('kbm_dash',{pass:p,days:days}).then(function(r){if(r.err){if(r.err==='locked'){A.innerHTML='<div class="card"><h2>잠금</h2>10분 뒤에 다시 시도해 주세요.</div>';return}ls('kbm_lab_pw',null);login(r.err==='unset'?'아직 비밀번호가 없어요. 설정 링크로 열어 주세요':'비밀번호가 달라요');return}D=r;draw()}).catch(function(){A.innerHTML='<div class="card">연결 실패. 인터넷을 확인해 주세요.<button onclick="load()">다시 시도</button></div>'})}
+var SRC={instagram:'인스타',youtube:'유튜브',tiktok:'틱톡',naver:'네이버/블로그',kakao:'카카오',facebook:'페이스북',x:'X',google:'구글',daum:'다음',invite:'초대링크',direct:'직접'};
+function sn(s){return SRC[s]||s}
+var DN=['일','월','화','수','목','금','토'],AGE={0:'18~19',1:'20대',2:'30대',3:'40대',4:'50대',5:'60대',6:'70+',8:'18세미만',9:'미응답'};
+function insights(d){var k=d.kpi,o=[],push=function(t,ok){o.push('<div class="ins'+(ok?' ok':'')+'">'+t+'</div>')};
+ if(k.sessions<30){push('🕐 아직 방문 '+k.sessions+'건이에요. 최소 방문 100건은 쌓여야 비율을 믿을 수 있어요. 지금은 <b>링크에 UTM을 붙여 올리는 것</b>이 먼저예요(맨 아래 링크 만들기).');}
+ var st=k.starts,dn=k.done;
+ if(k.visits>=30){var sr=pct(st,k.visits);push('시작률 '+sr+'% ('+k.visits+'명 중 '+st+'명). '+(sr<40?'첫 화면에서 이탈이 커요 → 첫 화면 문구·버튼을 바꿔 보세요.':'첫 화면은 괜찮아요.'),sr>=40)}
+ if(st>=20){var cr=pct(dn,st);push('완료율 '+cr+'%. '+(cr<50?'중간 이탈이 커요 → 10문항/20문항 이탈 구간을 확인하세요(깔때기).':'끝까지 하는 사람이 많아요.'),cr>=50)}
+ if(dn>=20){var sh=pct(k.shared,dn);push('공유율 '+sh+'% (완료 대비). '+(sh<20?'결과 화면에 공유 유도(내 뇌 카드·초대)를 더 눈에 띄게 하세요.':'공유가 잘 돼요. 바이럴 가능성이 있어요.'),sh>=20)}
+ var s=(d.source||[]).filter(function(x){return x.sessions>=10&&x.src!=='direct'});if(s.length){var b=s.slice().sort(function(a,c){return pct(c.done,c.sessions)-pct(a.done,a.sessions)})[0];push('가장 효율 좋은 채널: <b>'+sn(b.src)+'</b> (방문 대비 완료 '+pct(b.done,b.sessions)+'%). 이 채널에 영상·글을 더 올리세요.',true)}
+ var dv=d.device||[],mob=dv.filter(function(x){return x.dev==='mobile'})[0],tot=dv.reduce(function(a,x){return a+x.sessions},0);if(tot>=30&&mob)push('폰 이용 '+pct(mob.sessions,tot)+'%. '+(pct(mob.sessions,tot)>80?'폰 화면 최적화가 핵심이에요. PC 전용 작업은 우선순위 낮음.':'PC 비중이 높으니 PC 화면도 점검하세요.'),true)
+ var ia=(d.inapp||[]).filter(function(x){return x.inapp!=='browser'&&x.sessions>=10});if(ia.length)push('앱 안 브라우저('+ia.map(function(x){return x.inapp+' '+x.sessions}).join(', ')+')에서 오는 방문이 있어요. 인앱 브라우저는 저장·설치가 제한될 수 있으니 "기본 브라우저로 열기" 안내가 효과적이에요.');
+ var h=(d.hour||[]).slice().sort(function(a,c){return c.sessions-a.sessions})[0];if(h&&k.sessions>=30)push('유입이 가장 많은 시간: <b>'+h.h+'시</b>. 영상·글 업로드는 그 1~2시간 전이 유리해요.',true);
+ var nm=d.norms||{};var low=Object.keys(nm).length;if(!low)push('또래 평균은 연령대별 30명이 모이면 자동으로 켜져요.');
+ if(!o.length)push('자료를 쌓는 중이에요.');return o.join('')}
+function draw(){var d=D,k=d.kpi;var fun=[['방문',k.visits],['시작',k.starts],['10문항',k.q10],['20문항',k.q20],['완료',k.done],['공유/저장',k.shared]];
+ var H='<div class="tabs">'+[1,7,30,90].map(function(n){return '<button class="'+(n==days?'':'g')+'" data-d="'+n+'">'+(n==1?'오늘':n+'일')+'</button>'}).join('')+'</div>';
+ H+='<div class="card"><h2>핵심 숫자 <small>최근 '+d.days+'일 · 사람 단위(세션)</small></h2><div class="k">'+[['방문',k.visits,'#0033CC'],['검사 완료',d.tests,'#E00000'],['단체 시작',k.group,'#007A33'],['공유·저장',k.shared,'#6A1B9A'],['재방문',k.returning,'#E65100'],['초대링크 열림',k.invite_open,'#C2185B']].map(function(x){return '<div class="kp" style="background:'+x[2]+';color:#fff"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'}).join('')+'</div></div>';
+ H+='<div class="card"><h2>👉 오늘 할 일 (자동 제안)</h2>'+insights(d)+'</div>';
+ H+='<div class="card"><h2>깔때기 <small>어디서 사람이 빠지나</small></h2>'+bars(fun.map(function(x){return{n:x[0],c:x[1]}}),'n','c',k.visits)+'</div>';
+ H+='<div class="card"><h2>유입 경로별 성과</h2><table><tr><th>경로</th><th>방문</th><th>완료</th><th>완료율</th><th>공유</th></tr>'+(d.source||[]).map(function(x){return '<tr><td>'+E(sn(x.src))+'</td><td>'+x.sessions+'</td><td>'+x.done+'</td><td>'+pct(x.done,x.sessions)+'%</td><td>'+x.shared+'</td></tr>'}).join('')+'</table></div>';
+ if((d.campaign||[]).length)H+='<div class="card"><h2>영상·글(캠페인)별 성과</h2><table><tr><th>이름</th><th>방문</th><th>완료</th><th>공유</th></tr>'+d.campaign.map(function(x){return '<tr><td>'+E(sn(x.src))+' · '+E(x.camp)+(x.cont?' / '+E(x.cont):'')+'</td><td>'+x.sessions+'</td><td>'+x.done+'</td><td>'+x.shared+'</td></tr>'}).join('')+'</table></div>';
+ H+='<div class="card"><h2>기기 · 운영체제 · 앱 안/밖 · 언어</h2>'+bars(d.device,'dev','sessions',k.sessions)+'<hr>'+bars(d.os,'os','sessions',k.sessions)+'<hr>'+bars(d.inapp,'inapp','sessions',k.sessions)+'<hr>'+bars(d.lang,'lang','sessions',k.sessions)+'</div>';
+ var hr=[];for(var i=0;i<24;i++){var f=(d.hour||[]).filter(function(x){return x.h==i})[0];hr.push({h:i+'시',n:f?f.sessions:0})}
+ H+='<div class="card"><h2>시간대 (한국시간)</h2>'+bars(hr.filter(function(x){return x.n>0}),'h','n',k.sessions)+heat(d.heat)+'</div>';
+ H+='<div class="card"><h2>누가 하나 <small>완료 기준</small></h2>'+bars((d.mode||[]).map(function(x){return{m:({solo:'혼자',invite:'초대',g2:'2인',g3:'3인',g4:'4인'})[x.mode]||x.mode,n:x.n}}),'m','n',d.tests)+'<hr>'+bars((d.age||[]).map(function(x){return{a:AGE[x.age]||x.age,n:x.n}}),'a','n',d.tests)+'<hr>'+bars((d.hub||[]).map(function(x){return{h:({parent:'부모자녀·가족',friend:'친구',couple:'연인·부부',work:'직장'})[x.hub]||x.hub,n:x.n}}),'h','n',d.tests)+'</div>';
+ H+='<div class="card"><h2>뇌 유형 TOP · 평균 점수</h2>'+bars((d.types||[]).slice(0,10).map(function(x){return{k:x.k,n:x.n}}),'k','n',d.tests)+'<hr><small>5영역 평균(사고·감정·보상·습관·상상 순서는 앱 기준): '+(d.axis?d.axis.join(' / '):'자료 없음')+'</small><small>걸린 시간 중앙값: '+(d.dur&&d.dur.median?Math.round(d.dur.median/60*10)/10+'분 · 90% 구간 '+Math.round(d.dur.p90/60*10)/10+'분':'자료 없음')+'</small></div>';
+ var pc=d.pics||[];H+='<div class="card"><h2>그림 인기 순위 <small>평균 점수 · 3명 이상</small></h2>'+(pc.length?'<b>👍 TOP5</b>'+bars(pc.slice(0,5).map(function(x){return{i:x.id,a:x.avg}}),'i','a')+'<b>👎 BOTTOM5</b>'+bars(pc.slice(-5).map(function(x){return{i:x.id,a:x.avg}}),'i','a'):'<small>자료가 쌓이면 표시돼요</small>')+'</div>';
+ H+='<div class="card"><h2>또래 평균 준비 상황</h2><small>연령대별 30명 이상이면 앱에 평균 비교가 켜져요.</small><pre style="white-space:pre-wrap;font-size:13px">'+E(JSON.stringify(d.norms))+'</pre></div>';
+ H+='<div class="card"><h2>🔗 추적 링크 만들기</h2><small>영상·글마다 다른 이름을 붙여 올리면 어디서 사람이 오는지 알 수 있어요.</small><select id="us"><option>youtube</option><option>tiktok</option><option>instagram</option><option>blog</option><option>kakao</option></select><input id="uc" placeholder="이름 예: 가족편_쇼츠1 (영문·숫자 권장)"><button id="ub" class="r">링크 만들기</button><div id="uo"></div></div>';
+ H+='<div class="card"><h2>최근 기록 25건</h2><table><tr><th>시간</th><th>행동</th><th>경로</th><th>기기</th></tr>'+(d.recent||[]).map(function(x){var t=new Date(x.t);return '<tr><td>'+(t.getMonth()+1)+'/'+t.getDate()+' '+('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+'</td><td>'+E(x.e)+'</td><td>'+E(sn(x.src||'direct'))+'</td><td>'+E(x.dev||'')+'</td></tr>'}).join('')+'</table></div>';
+ H+='<button class="g" onclick="load()">새로고침</button><button class="r" id="lo">로그아웃</button>';
+ A.innerHTML=H;
+ A.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){days=+b.dataset.d;load()}});
+ document.getElementById('lo').onclick=function(){ls('kbm_lab_pw',null);login()};
+ document.getElementById('ub').onclick=function(){var s=document.getElementById('us').value,c=document.getElementById('uc').value.trim().replace(/[^\w\-가-힣]/g,'_')||'main';var u=APP+'?utm_source='+s+'&utm_medium=social&utm_campaign=brainmatch&utm_content='+encodeURIComponent(c);document.getElementById('uo').innerHTML='<code>'+E(u)+'</code><button id="cp">복사</button>';document.getElementById('cp').onclick=function(){try{navigator.clipboard.writeText(u);this.textContent='복사됨 ✓'}catch(e){this.textContent='길게 눌러 복사'}}}}
+function heat(h){var g={},m=1;(h||[]).forEach(function(x){g[x.dow+'_'+x.h]=x.n;if(x.n>m)m=x.n});var o='<small style="margin-top:12px"><b>요일×시간 열지도</b> (진할수록 많음)</small><div class="heat"><div></div>';for(var i=0;i<24;i++)o+='<div style="aspect-ratio:auto">'+(i%6==0?i:'')+'</div>';for(var w=0;w<7;w++){o+='<div style="aspect-ratio:auto;line-height:2">'+DN[w]+'</div>';for(i=0;i<24;i++){var n=g[w+'_'+i]||0;o+='<div style="background:'+(n?'rgba(224,0,0,'+(0.25+0.75*n/m)+')':'#eee')+'"></div>'}}return o+'</div>'}
+load();
+</script></body></html>
