@@ -199,7 +199,8 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
 .two .type{padding:12px}
 .two .type h2{font-size:21px}
 .lab{display:inline-block;padding:0 12px;border-radius:999px;color:#fff;font-size:14px;line-height:1.9;font-weight:900;border:2px solid #000}
-.lab.same{background:var(--green)}.lab.some{background:var(--blue)}.lab.big{background:var(--red)}
+.lab.same{background:var(--green)}.lab.some{background:var(--yellow);color:#000}.lab.big{background:var(--orange)}
+.two>div:nth-child(1) .type{border-color:#0033CC}.two>div:nth-child(2) .type{border-color:#E00000}
 .pct{display:flex;align-items:center;gap:14px}
 .pct b{display:block;font-size:20px;color:var(--navy);line-height:1.5}
 .lock{background:#fff;border:4px dashed var(--red);border-radius:16px;padding:14px;margin:0 0 14px}
@@ -756,7 +757,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     var r = 44, c = 2 * Math.PI * r, d = (c * p / 100).toFixed(1);
     return '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="점수 패턴 겹침 ' + p + '%">' +
       '<circle cx="60" cy="60" r="' + r + '" fill="#fff" stroke="#D5DCF5" stroke-width="16"/>' +
-      '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="#E00000" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + d + ' ' + c.toFixed(1) + '" transform="rotate(-90 60 60)"/>' +
+      '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="#FFB000" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + d + ' ' + c.toFixed(1) + '" transform="rotate(-90 60 60)"/>' +
       '<text x="60" y="68" text-anchor="middle" font-size="26" font-weight="900" fill="#0C0C0C" font-family="inherit">' + p + '%</text></svg>';
   }
 
@@ -925,7 +926,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
   function idealHtml(s) {
     var id = idealOf(s), r = rankOf(s), weak = r[4], strong = r[0], k, h = '', ord = [0, 1, 2, 3, 4].sort(function (a, b) { return (s[a] - s[b]) || (a - b); }), tr = [], used = {};
     h += '<div class="card c3"><b class="t">이상적 파트너 프로필</b><p style="font-size:15px">내 점수와 나에게 균형을 줄 수 있는 점수 예시입니다.</p>';
-    h += '<p style="font-size:15px"><span class="lab" style="background:#0033CC">파랑 · 나</span> <span class="lab" style="background:#B45309">노랑 · 이상적 파트너</span></p>';
+    h += '<p style="font-size:15px"><span class="lab" style="background:#0033CC">파랑 · 나</span> <span class="lab" style="background:#FFD400;color:#000">노랑 · 이상적 파트너</span></p>';
     for (k = 0; k < 5; k++) {
       var df = id[k] - s[k];
       h += '<div style="margin:8px 0 4px"><div style="display:flex;justify-content:space-between;font-weight:900"><span style="color:' + AX[k].col + '">' + AX[k].n + '</span><span>' + s[k] + ' / ' + id[k] + ' (' + (df > 0 ? '+' : '') + df + ')</span></div>' +
@@ -1040,14 +1041,14 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       if (Math.max(a.s[k], b.s[k]) < Math.max(a.s[weakest], b.s[weakest])) { weakest = k; }
     }
     h += '<div class="card c4"><b class="t">두 사람의 케미</b>' +
-      '<p><span class="lab" style="background:' + AX[best].col + '">함께 불붙는 영역</span> ' + AX[best].n + '</p>' +
-      '<p><span class="lab" style="background:' + AX[mostDiff].col + '">서로 채워 주는 영역</span> ' + AX[mostDiff].n + '</p>' +
-      '<p><span class="lab" style="background:' + AX[weakest].col + '">함께 챙길 영역</span> ' + AX[weakest].n + '</p></div>';
+      '<p><span class="lab" style="background:#0C0C0C">함께 불붙는 영역</span> ' + AX[best].n + '</p>' +
+      '<p><span class="lab" style="background:#0C0C0C">서로 채워 주는 영역</span> ' + AX[mostDiff].n + '</p>' +
+      '<p><span class="lab" style="background:#0C0C0C">함께 챙길 영역</span> ' + AX[weakest].n + '</p></div>';
     for (k = 0; k < 5; k++) {
       var kind = pairKind(a.s[k], b.s[k]), cs = pairCase(a.s[k], b.s[k]);
-      h += '<div class="card c' + (k + 1) + '"><b class="t" style="color:' + AX[k].col + '">' + AX[k].n + '</b> <span class="lab ' + kind + '">' + KIND[kind] + '</span>' +
-        '<div class="mrow"><div class="h"><span>' + esc(an) + '</span><span>' + a.s[k] + '점 · ' + LV[levelOf(a.s[k])] + '</span></div><div class="meter"><i style="width:' + a.s[k] + '%;background:#0033CC"></i></div></div>' +
-        '<div class="mrow"><div class="h"><span>' + esc(bn) + '</span><span>' + b.s[k] + '점 · ' + LV[levelOf(b.s[k])] + '</span></div><div class="meter"><i style="width:' + b.s[k] + '%;background:#E00000"></i></div></div>' +
+      h += '<div class="card c' + (k + 1) + '"><b class="t" style="color:#000">' + AX[k].n + '</b> <span class="lab ' + kind + '">' + KIND[kind] + '</span>' +
+        '<div class="mrow"><div class="h"><span style="color:#0033CC">' + esc(an) + '</span><span>' + a.s[k] + '점 · ' + LV[levelOf(a.s[k])] + '</span></div><div class="meter"><i style="width:' + a.s[k] + '%;background:#0033CC"></i></div></div>' +
+        '<div class="mrow"><div class="h"><span style="color:#E00000">' + esc(bn) + '</span><span>' + b.s[k] + '점 · ' + LV[levelOf(b.s[k])] + '</span></div><div class="meter"><i style="width:' + b.s[k] + '%;background:#E00000"></i></div></div>' +
         '<p style="margin-top:8px">' + esc(AX[k].pr[cs]) + '</p></div>';
     }
     h += '<div class="card cy"><b class="t">서로에게 이렇게 말해 보세요</b>' +
@@ -1119,12 +1120,12 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       if (k) { if (mn[k] > mn[best]) { best = k; } if (rg[k] > rg[mostDiff]) { mostDiff = k; } if (mx[k] < mx[weakest]) { weakest = k; } }
     }
     h += '<div class="card c5"><b class="t">' + LN('세 사람의 케미', 'Group chemistry') + '</b>' +
-      '<p><span class="lab" style="background:' + AX[best].col + '">' + LN('모두 불붙는 영역', 'Strong for all three') + '</span> ' + AX[best].n + '</p>' +
-      '<p><span class="lab" style="background:' + AX[mostDiff].col + '">' + LN('서로 채워 주는 영역', 'Where you fill each other in') + '</span> ' + AX[mostDiff].n + '</p>' +
-      '<p><span class="lab" style="background:' + AX[weakest].col + '">' + LN('함께 챙길 영역', 'Look after together') + '</span> ' + AX[weakest].n + '</p></div>';
+      '<p><span class="lab" style="background:#0C0C0C">' + LN('모두 불붙는 영역', 'Strong for all three') + '</span> ' + AX[best].n + '</p>' +
+      '<p><span class="lab" style="background:#0C0C0C">' + LN('서로 채워 주는 영역', 'Where you fill each other in') + '</span> ' + AX[mostDiff].n + '</p>' +
+      '<p><span class="lab" style="background:#0C0C0C">' + LN('함께 챙길 영역', 'Look after together') + '</span> ' + AX[weakest].n + '</p></div>';
     for (k = 0; k < 5; k++) {
       var kind = pairKind(mx[k], mn[k]), cs = pairCase(mx[k], mn[k]);
-      h += '<div class="card c' + (k + 1) + '"><b class="t" style="color:' + AX[k].col + '">' + AX[k].n + '</b> <span class="lab ' + kind + '">' + KIND[kind] + '</span>';
+      h += '<div class="card c' + (k + 1) + '"><b class="t" style="color:#000">' + AX[k].n + '</b> <span class="lab ' + kind + '">' + KIND[kind] + '</span>';
       for (j = 0; j < 3; j++) {
         h += '<div class="mrow"><div class="h"><span>' + esc(nm[j]) + '</span><span>' + r[j].s[k] + '점 · ' + LV[levelOf(r[j].s[k])] + '</span></div><div class="meter"><i style="width:' + r[j].s[k] + '%;background:' + PCOL[j] + '"></i><u style="left:35%"></u><u style="left:65%"></u></div></div>';
       }
