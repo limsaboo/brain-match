@@ -37,10 +37,10 @@ function bars(rows,lab,val,tot){var m=Math.max.apply(null,rows.map(function(r){r
 function login(msg){var h=(location.hash.match(/s=([^&]+)/)||[])[1];
  A.innerHTML='<div class="card"><h2>'+(h?'처음 비밀번호 정하기':'관제실 로그인')+'</h2>'+(msg?'<div class="ins">'+E(msg)+'</div>':'')+'<input id="pw" type="password" placeholder="'+(h?'새 비밀번호 (6자 이상)':'비밀번호')+'" autocomplete="'+(h?'new-password':'current-password')+'"><button id="go">'+(h?'비밀번호 정하고 시작':'들어가기')+'</button><small>비밀번호는 이 폰에만 저장되고, 5번 틀리면 10분간 잠겨요.</small></div>';
  document.getElementById('go').onclick=function(){var p=document.getElementById('pw').value;if(p.length<6){login('6자 이상 입력해 주세요');return}
-  if(h){rpc('kbm_claim',{setup:decodeURIComponent(h),pass:p}).then(function(r){if(r&&r.ok){ls('kbm_lab_pw',p);history.replaceState(null,'',location.pathname);load()}else login('설정 링크가 이미 사용됐거나 올바르지 않아요: '+JSON.stringify(r))})}
+  if(h){rpc('kbm_claim',{setup:decodeURIComponent(h),pass:p}).then(function(r){if(r&&r.ok){ls('kbm_lab_pw',p);history.replaceState(null,'',location.pathname);load()}else if(r&&r.err==='already'){ls('kbm_lab_pw',p);history.replaceState(null,'',location.pathname);load()}else login('설정 링크가 올바르지 않아요')})}
   else{ls('kbm_lab_pw',p);load()}}}
 function load(){var p=ls('kbm_lab_pw');if(!p){login();return}A.innerHTML='<div class="card">불러오는 중…</div>';
- rpc('kbm_dash',{pass:p,days:days}).then(function(r){if(r.err){if(r.err==='locked'){A.innerHTML='<div class="card"><h2>잠금</h2>10분 뒤에 다시 시도해 주세요.</div>';return}ls('kbm_lab_pw',null);login(r.err==='unset'?'아직 비밀번호가 없어요. 설정 링크로 열어 주세요':'비밀번호가 달라요');return}D=r;draw()}).catch(function(){A.innerHTML='<div class="card">연결 실패. 인터넷을 확인해 주세요.<button onclick="load()">다시 시도</button></div>'})}
+ rpc('kbm_dash',{pass:p,days:days}).then(function(r){if(r.err){if(r.err==='locked'){A.innerHTML='<div class="card"><h2>잠금</h2>10분 뒤에 다시 시도해 주세요.</div>';return}ls('kbm_lab_pw',null);history.replaceState(null,'',location.pathname);login(r.err==='unset'?'아직 비밀번호가 없어요. 설정 링크로 열어 주세요':'비밀번호가 달라요. 처음에 정한 비밀번호를 입력해 주세요');return}D=r;draw()}).catch(function(){A.innerHTML='<div class="card">연결 실패. 인터넷을 확인해 주세요.<button onclick="load()">다시 시도</button></div>'})}
 var SRC={instagram:'인스타',youtube:'유튜브',tiktok:'틱톡',naver:'네이버/블로그',kakao:'카카오',facebook:'페이스북',x:'X',google:'구글',daum:'다음',invite:'초대링크',direct:'직접'};
 function sn(s){return SRC[s]||s}
 var DN=['일','월','화','수','목','금','토'],AGE={0:'18~19',1:'20대',2:'30대',3:'40대',4:'50대',5:'60대',6:'70+',8:'18세미만',9:'미응답'};
