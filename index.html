@@ -200,7 +200,6 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
 .two .type h2{font-size:21px}
 .lab{display:inline-block;padding:0 12px;border-radius:999px;color:#fff;font-size:14px;line-height:1.9;font-weight:900;border:2px solid #000}
 .lab.same{background:var(--green)}.lab.some{background:var(--yellow);color:#000}.lab.big{background:var(--orange)}
-.two>div:nth-child(1) .type{border-color:#0033CC}.two>div:nth-child(2) .type{border-color:#E00000}
 .pct{display:flex;align-items:center;gap:14px}
 .pct b{display:block;font-size:20px;color:var(--navy);line-height:1.5}
 .lock{background:#fff;border:4px dashed var(--red);border-radius:16px;padding:14px;margin:0 0 14px}
@@ -510,7 +509,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
   /* =========================================================
      4. 문항 구성 / 점수 / 유형
      ========================================================= */
-  var S = { group: null, screen: 'home', hub: null, nick: '', qi: 0, ans: [], me: null, inv: null, age: 9, adult: false };
+  var S = { group: null, screen: 'home', hub: null, nick: '', col: 'y', qi: 0, ans: [], me: null, inv: null, age: 9, adult: false };
   /* 언어: 저장된 선택 > 기기 언어. (이 기기의 localStorage에만 저장) */
   var LANG = 'ko';
   try { var sl = localStorage.getItem('kbm_lang'); if (sl === 'ko' || sl === 'en' || sl === 'ja' || sl === 'ru' || sl === 'uz') { LANG = sl; } else { var nl = (navigator.language || 'ko').toLowerCase(); LANG = (nl.indexOf('ko') === 0) ? 'ko' : ((nl.indexOf('ja') === 0) ? 'ja' : ((nl.indexOf('ru') === 0) ? 'ru' : ((nl.indexOf('uz') === 0) ? 'uz' : 'en'))); } } catch (eL) { }
@@ -686,17 +685,17 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function base() { return String(location.href).split('#')[0]; }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
-  function inviteLink(hub, s, nick, age) {
+  function inviteLink(hub, s, nick, age, col) {
     var code = s.map(function (v) { return pad2(Math.round(v * 24 / 100)); }).join('');
-    return base() + '#i=' + hub + '.' + code + '.' + (age >= 0 && age <= 6 ? age : 9) + '.' + encodeURIComponent(nick || '');
+    return base() + '#i=' + hub + '.' + code + '.' + (age >= 0 && age <= 6 ? age : 9) + (col && col !== 'y' && UCOL[col] ? col : '') + '.' + encodeURIComponent(nick || '');
   }
   function parseInvite(hash) {
-    var m = new RegExp('^#i=(' + HUBRE + ')\\.(\\d{10})\\.(\\d)\\.(.*)$').exec(hash || '');
+    var m = new RegExp('^#i=(' + HUBRE + ')\\.(\\d{10})\\.(\\d)([pbvy]?)\\.(.*)$').exec(hash || '');
     if (!m) { return null; }
     var s = [], k, v, nick = '';
     for (k = 0; k < 5; k++) { v = Number(m[2].substr(k * 2, 2)); if (v > 24) { return null; } s.push(pctOf(v + 6)); }
-    try { nick = decodeURIComponent(m[4]); } catch (e) { nick = ''; }
-    return { hub: m[1], s: s, nick: nick.slice(0, 10), age: Number(m[3]) <= 6 ? Number(m[3]) : 9 };
+    try { nick = decodeURIComponent(m[5]); } catch (e) { nick = ''; }
+    return { hub: m[1], s: s, nick: nick.slice(0, 10), age: Number(m[3]) <= 6 ? Number(m[3]) : 9, col: m[4] || 'y' };
   }
   function track(name, data) { (window.__events = window.__events || []).push({ e: name, d: data || {}, t: Date.now() }); }
 
@@ -866,6 +865,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       '<div class="card c2"><b class="t">그림 30장, 마음에 드는 정도를 눌러 주세요</b><p>정답은 없어요. 그림을 한 장씩 보고 1점(전혀)부터 5점(최고)까지, 지금 느낌대로 누르면 됩니다.</p>' +
       '<div class="samples" style="margin-top:10px;max-width:300px">' + cardSvg(2, 1, 0, 0) + cardSvg(3, 1, 0, 1) + '</div>' +
       '<p style="margin-top:6px">별명(선택)</p><input class="txt" id="nick" maxlength="10" placeholder="예: 민수 (비워도 됩니다)" value="' + esc(S.nick) + '"></div>';
+    h += '<div class="card c3"><b class="t">내 색(선택)</b><p>결과 그래프에서 나를 나타낼 색이에요. 고르지 않으면 노랑이에요.</p><select class="txt" id="colsel">' + colOpts(S.col) + '</select></div>';
     h += '<div class="card c1"><b class="t">연령대(선택)</b><p>나이대를 고르면 또래 평균과 비교해요.</p><div class="ages">';
     AGES.forEach(function (a, i) { h += '<button data-act="age" data-v="' + i + '"' + (S.age === i ? ' class="on"' : '') + '>' + a + '</button>'; });
     h += '<button data-act="age" data-v="9"' + (S.age === 9 ? ' class="on"' : '') + '>선택 안 함</button></div></div>';
@@ -924,14 +924,14 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     '산책 모임, 전통문화 체험, 악기·서예·자수 같은 꾸준한 취미반처럼 편안한 리듬의 자리에서 대화를 시작해 보세요.',
     '미술·사진 전시, 글쓰기·작곡 모임, 여행 소모임, 영화·연극 동호회처럼 상상을 나누는 자리에서 대화를 시작해 보세요.'];
   function idealHtml(s) {
-    var id = idealOf(s), r = rankOf(s), weak = r[4], strong = r[0], k, h = '', ord = [0, 1, 2, 3, 4].sort(function (a, b) { return (s[a] - s[b]) || (a - b); }), tr = [], used = {};
+    var um = ucol(S.me && S.me.col), ic = (S.me && S.me.col && S.me.col !== 'y') ? { n: '노랑', c: '#F2A900', t: '#000' } : { n: '초록', c: '#007A33', t: '#fff' }, id = idealOf(s), r = rankOf(s), weak = r[4], strong = r[0], k, h = '', ord = [0, 1, 2, 3, 4].sort(function (a, b) { return (s[a] - s[b]) || (a - b); }), tr = [], used = {};
     h += '<div class="card c3"><b class="t">이상적 파트너 프로필</b><p style="font-size:15px">내 점수와 나에게 균형을 줄 수 있는 점수 예시입니다.</p>';
-    h += '<p style="font-size:15px"><span class="lab" style="background:#0033CC">파랑 · 나</span> <span class="lab" style="background:#FFD400;color:#000">노랑 · 이상적 파트너</span></p>';
+    h += '<p style="font-size:15px"><span class="lab" style="background:' + um.c + ';color:' + um.t + '">' + um.n + ' · 나</span> <span class="lab" style="background:' + ic.c + ';color:' + ic.t + '">' + ic.n + ' · 이상적 파트너</span></p>';
     for (k = 0; k < 5; k++) {
       var df = id[k] - s[k];
       h += '<div style="margin:8px 0 4px"><div style="display:flex;justify-content:space-between;font-weight:900"><span style="color:' + AX[k].col + '">' + AX[k].n + '</span><span>' + s[k] + ' / ' + id[k] + ' (' + (df > 0 ? '+' : '') + df + ')</span></div>' +
-        '<div style="height:12px;background:#E5E7EB;border-radius:8px;overflow:hidden;margin:2px 0"><div style="height:12px;width:' + s[k] + '%;background:#0033CC"></div></div>' +
-        '<div style="height:12px;background:#E5E7EB;border-radius:8px;overflow:hidden"><div style="height:12px;width:' + id[k] + '%;background:#FFD400"></div></div></div>';
+        '<div style="height:12px;background:#E5E7EB;border-radius:8px;overflow:hidden;margin:2px 0"><div style="height:12px;width:' + s[k] + '%;background:' + um.c + '"></div></div>' +
+        '<div style="height:12px;background:#E5E7EB;border-radius:8px;overflow:hidden"><div style="height:12px;width:' + id[k] + '%;background:' + ic.c + '"></div></div></div>';
     }
     h += '</div>';
     tr.push(IDEAL_CD[ord[0]]); used[ord[0]] = 1;
@@ -976,8 +976,8 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     if (topPct(s[bt], ref.v[bt]) <= 50) { h += '<span class="tag" style="background:#B45309">또래 상위 ' + topPct(s[bt], ref.v[bt]) + '% · ' + AX[bt].n + '(예상)</span>'; }
     h += '</div>';
     h += '<div class="card c1"><b class="t">뇌 성향 점수 레이더</b><p>바깥쪽일수록 점수가 높아요.</p>' +
-      radarSvg([{ v: s, col: '#0033CC', fill: 'rgba(255,212,0,.5)' }, { v: ref.v, col: '#111', fill: 'none', dash: true }], true, ['나', '평균']) +
-      '<p style="font-size:15px"><span class="lab" style="background:#0033CC">실선 · 나</span> <span class="lab" style="background:#111">점선 · ' + esc(ref.label) + '</span> </p></div>';
+      radarSvg([{ v: s, col: ucol(me.col).c, fill: ucol(me.col).f }, { v: ref.v, col: '#111', fill: 'none', dash: true }], true, ['나', '평균']) +
+      '<p style="font-size:15px"><span class="lab" style="background:' + ucol(me.col).c + ';color:' + ucol(me.col).t + '">실선 · 나</span> <span class="lab" style="background:#111">점선 · ' + esc(ref.label) + '</span> </p></div>';
     h += '<div class="card c2"><b class="t">뇌 지도 (개략도)</b>' + brainSvg(s) + '</div>';
     h += '<div class="card c3"><b class="t">영역별 점수 (0~100점)</b>';
     for (k = 0; k < 5; k++) { h += meter(k, s[k], ref.v[k]); }
@@ -1007,7 +1007,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     } else if (S.inv) {
       h += '<button class="btn red" data-act="pair">' + LN(esc(S.inv.nick || '상대') + '님과 둘의 결과 보기', 'See your combined result with ' + esc(S.inv.nick || 'them'), esc(S.inv.nick || '相手') + 'さんとの2人の結果を見る', { ru: 'Общий результат: ' + esc(S.inv.nick || 'партнёр'), uz: esc(S.inv.nick || 'Sherik') + ' bilan umumiy natija' }) + '</button>';
     } else {
-      var link = inviteLink(S.hub, s, me.nick, me.age);
+      var link = inviteLink(S.hub, s, me.nick, me.age, me.col);
       h += '<div class="card cy"><b class="t">' + (LANG === 'ko' ? '그 사람에게 보내서&nbsp;두&nbsp;사람의 레이더를 겹쳐 보세요' : '그 사람에게 보내서 두 사람의 레이더를 겹쳐 보세요') + '</b>' +
         '<p>링크를 받은 사람이 그림 30장에 점수를 주면 둘의 결과가 나옵니다.</p>' +
         '<input class="txt" id="lnk" readonly value="' + esc(link) + '">' +
@@ -1020,20 +1020,21 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     return h;
   }
 
-  function miniType(label, nick, s) {
+  function miniType(label, nick, s, ccol) {
     var t = TYPES[typeKey(s)];
-    return '<div><div class="type"><div class="k">' + esc(label) + (nick ? ' · ' + esc(nick) : '') + '</div><h2>' + esc(t.name) + '</h2><p style="font-size:15px;line-height:1.7">' + esc(t.line) + '</p></div></div>';
+    return '<div><div class="type"' + (ccol ? ' style="border-color:' + ccol + '"' : '') + '><div class="k">' + esc(label) + (nick ? ' · ' + esc(nick) : '') + '</div><h2>' + esc(t.name) + '</h2><p style="font-size:15px;line-height:1.7">' + esc(t.line) + '</p></div></div>';
   }
 
   function vPair() {
     var g = S.group, a = g ? g.res[0] : S.inv, b = g ? g.res[1] : S.me, an = a.nick || T('초대한 분'), bn = b.nick || T('나'), k, h = '';
     var pct = overlap(a.s, b.s), ta = TYPES[typeKey(a.s)], tb = TYPES[typeKey(b.s)];
+    var pc = pairCols(a.col, b.col), ua = ucol(pc[0]), ub = ucol(pc[1]);
     h += '<div class="sec"><div class="rep">' + logoSvg(44) + '<div><small>한국뇌궁합연구소 · 두 사람 분석 보고서</small><b>' + esc(an) + ' × ' + esc(bn) + '</b></div></div>';
-    h += '<div class="two">' + miniType(g ? LN('1번째 사람', 'Person 1') : T('초대한 분'), a.nick, a.s) + miniType(g ? LN('2번째 사람', 'Person 2') : T('나'), b.nick, b.s) + '</div>';
+    h += '<div class="two">' + miniType(g ? LN('1번째 사람', 'Person 1') : T('초대한 분'), a.nick, a.s, ua.c) + miniType(g ? LN('2번째 사람', 'Person 2') : T('나'), b.nick, b.s, ub.c) + '</div>';
     h += '<div class="card c2"><div class="pct">' + donutSvg(pct) + '<div><b>' + overlapLabel(pct) + '</b><span style="font-size:15px;display:block;line-height:1.7">점수 패턴 겹침률. 두 사람의 그림 선택이 얼마나 겹치는지입니다.</span></div></div><p style="margin-top:8px">' + esc(overlapLine(pct)) + '</p></div>';
     h += '<div class="card c1"><b class="t">두 사람의 뇌 성향 레이더</b>' +
-      radarSvg([{ v: a.s, col: '#0033CC', fill: 'rgba(0,51,204,.22)', dot: '#0033CC' }, { v: b.s, col: '#E00000', fill: 'rgba(224,0,0,.2)', dot: '#E00000' }], true) +
-      '<p style="font-size:15px"><span class="lab same" style="background:#0033CC">' + esc(an) + '</span> <span class="lab" style="background:#E00000">' + esc(bn) + '</span> (숫자는 ' + esc(an) + ' · ' + esc(bn) + ' 순서)</p></div>';
+      radarSvg([{ v: a.s, col: ua.c, fill: ua.f, dot: ua.c }, { v: b.s, col: ub.c, fill: ub.f, dot: ub.c }], true) +
+      '<p style="font-size:15px"><span class="lab" style="background:' + ua.c + ';color:' + ua.t + '">' + esc(an) + '</span> <span class="lab" style="background:' + ub.c + ';color:' + ub.t + '">' + esc(bn) + '</span> (숫자는 ' + esc(an) + ' · ' + esc(bn) + ' 순서)</p></div>';
     var best = 0, mostDiff = 0, weakest = 0;
     for (k = 1; k < 5; k++) {
       if (Math.min(a.s[k], b.s[k]) > Math.min(a.s[best], b.s[best])) { best = k; }
@@ -1047,8 +1048,8 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     for (k = 0; k < 5; k++) {
       var kind = pairKind(a.s[k], b.s[k]), cs = pairCase(a.s[k], b.s[k]);
       h += '<div class="card c' + (k + 1) + '"><b class="t" style="color:#000">' + AX[k].n + '</b> <span class="lab ' + kind + '">' + KIND[kind] + '</span>' +
-        '<div class="mrow"><div class="h"><span style="color:#0033CC">' + esc(an) + '</span><span>' + a.s[k] + '점 · ' + LV[levelOf(a.s[k])] + '</span></div><div class="meter"><i style="width:' + a.s[k] + '%;background:#0033CC"></i></div></div>' +
-        '<div class="mrow"><div class="h"><span style="color:#E00000">' + esc(bn) + '</span><span>' + b.s[k] + '점 · ' + LV[levelOf(b.s[k])] + '</span></div><div class="meter"><i style="width:' + b.s[k] + '%;background:#E00000"></i></div></div>' +
+        '<div class="mrow"><div class="h"><span style="color:' + ua.c + '">' + esc(an) + '</span><span>' + a.s[k] + '점 · ' + LV[levelOf(a.s[k])] + '</span></div><div class="meter"><i style="width:' + a.s[k] + '%;background:' + ua.c + '"></i></div></div>' +
+        '<div class="mrow"><div class="h"><span style="color:' + ub.c + '">' + esc(bn) + '</span><span>' + b.s[k] + '점 · ' + LV[levelOf(b.s[k])] + '</span></div><div class="meter"><i style="width:' + b.s[k] + '%;background:' + ub.c + '"></i></div></div>' +
         '<p style="margin-top:8px">' + esc(AX[k].pr[cs]) + '</p></div>';
     }
     h += '<div class="card cy"><b class="t">서로에게 이렇게 말해 보세요</b>' +
@@ -1060,6 +1061,14 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     return h;
   }
 
+  var UCOL = { p: { n: '분홍', j: '은', c: '#FF5C9E', f: 'rgba(255,92,158,.25)', t: '#000' }, b: { n: '하늘색', j: '은', c: '#1E9BEF', f: 'rgba(30,155,239,.25)', t: '#000' }, v: { n: '보라', j: '는', c: '#8E3FD6', f: 'rgba(142,63,214,.25)', t: '#fff' }, y: { n: '노랑', j: '은', c: '#F2A900', f: 'rgba(242,169,0,.3)', t: '#000' } };
+  function ucol(k) { return UCOL[k] || UCOL.y; }
+  function pairCols(ka, kb) { ka = UCOL[ka] ? ka : 'y'; kb = UCOL[kb] ? kb : 'y'; if (ka === kb) { kb = (ka === 'v') ? 'y' : 'v'; } return [ka, kb]; }
+  function colOpts(sel) {
+    var L = [['y', '노랑 (선택 안 함)'], ['p', '분홍'], ['b', '하늘색'], ['v', '보라']], o = '', i;
+    for (i = 0; i < L.length; i++) { o += '<option value="' + L[i][0] + '"' + ((sel || 'y') === L[i][0] ? ' selected' : '') + '>' + L[i][1] + '</option>'; }
+    return o;
+  }
   var PCOL = ['#0033CC', '#E00000', '#007A33'], PFILL = ['rgba(0,51,204,.22)', 'rgba(224,0,0,.2)', 'rgba(0,122,51,.22)'], PNM = ['A', 'B', 'C'];
   function groupBtns(g) {
     var o = '', i;
@@ -1079,7 +1088,8 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
         '<p style="margin-top:6px">' + LN('별명(선택)', 'Nickname (optional)') + '</p><input class="txt" id="gn' + i + '" maxlength="10" placeholder="' + PNM[i] + '" value="' + esc(g.people[i].nick) + '">' +
         '<p style="margin-top:8px">' + LN('연령대(선택)', 'Age group (optional)') + '</p><select class="txt" id="ga' + i + '">';
       AGES.forEach(function (a, n) { h += '<option value="' + n + '"' + (g.people[i].age === n ? ' selected' : '') + '>' + a + '</option>'; });
-      h += '<option value="9"' + (g.people[i].age === 9 ? ' selected' : '') + '>' + LN('선택 안 함', 'Prefer not to say') + '</option></select></div>';
+      h += '<option value="9"' + (g.people[i].age === 9 ? ' selected' : '') + '>' + LN('선택 안 함', 'Prefer not to say') + '</option></select>' +
+        '<p style="margin-top:8px">' + LN('내 색(선택)', 'My color (optional)') + '</p><select class="txt" id="gc' + i + '">' + colOpts(g.people[i].col) + '</select></div>';
     }
     h += '<div class="note">' + LN('만 18세 이상 · 별명에 실명 등 개인정보를 쓰지 마세요.', 'Adults 18+ · Please do not use real names as nicknames.') + '</div>' +
       '<label class="adult"><input type="checkbox" id="gadult"' + (S.adult ? ' checked' : '') + '> ' + LN('모두 만 18세 이상입니다', 'Everyone here is 18 or older') + '</label>' +
@@ -1263,7 +1273,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     document.body.appendChild(a); a.click(); a.parentNode.removeChild(a); toast('이미지를 저장했어요');
   }
 
-  /* 공유 카드 이미지: 혼자 결과 = 초대 카드(파랑은 나), 두 사람 결과 = 파랑/빨강 비교 카드 */
+  /* 공유 카드 이미지: 혼자 결과 = 초대 카드(내 색은 나), 두 사람 결과 = 두 색 비교 카드 */
   var CARDFONT = "'Noto Sans KR','Noto Sans CJK KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif";
   function cdT(x, y, size, fill, txt, anchor) { return '<text x="' + x + '" y="' + y + '" font-size="' + size + '" font-weight="900" fill="' + fill + '" text-anchor="' + (anchor || 'middle') + '" font-family="' + CARDFONT + '">' + esc(txt) + '</text>'; }
   function cdRadar(series, cx, cy, R) {
@@ -1285,6 +1295,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     return { svg: o, h: rows.length * 68 };
   }
   function shareCardSvg() {
+    var cu = ucol(S.me && S.me.col);
     var o = '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">' +
       '<rect x="0" y="0" width="1080" height="1350" fill="#fff"/><rect x="5" y="5" width="1070" height="1340" rx="44" fill="#EAF0FF" stroke="#000" stroke-width="10"/>' +
       '<path d="M10 54 Q10 10 54 10 L1026 10 Q1070 10 1070 54 L1070 150 L10 150 Z" fill="#FFD400"/><line x1="10" y1="150" x2="1070" y2="150" stroke="#000" stroke-width="10"/>';
@@ -1296,20 +1307,22 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     var k, c;
     if (S.screen === 'result' && S.me) {
       var s = S.me.s, key = typeKey(s), t = TYPES[key], r = rankOf(s), chips = [];
-      o += dot(360, '#0033CC') + cdT(410, 98, 58, '#000', '파랑은 나', 'start');
+      o += dot(360, cu.c) + cdT(410, 98, 58, '#000', cu.n + cu.j + ' 나', 'start');
       o += cdT(540, 250, 56, '#000', '나는 \'' + t.name + '\' 유형!');
-      o += cdT(540, 322, 38, '#000', '너는 어떤 유형일까?') + cdT(540, 372, 38, '#000', '그림 30장만 고르면 빨강이 겹쳐 그려져요');
-      o += cdRadar([{ s: s, col: '#0033CC', fill: 'rgba(0,51,204,.25)' }], 540, 700, 185);
-      if (key !== 'BAL') { chips.push({ t: '1순위 ' + AX[r[0]].n + ' ' + s[r[0]], bg: '#0033CC', fg: '#fff' }, { t: '2순위 ' + AX[r[1]].n + ' ' + s[r[1]], bg: '#0033CC', fg: '#fff' }); } else { chips.push({ t: '다섯 영역 점수가 비슷함', bg: '#007A33', fg: '#fff' }); }
+      o += cdT(540, 322, 38, '#000', '너는 어떤 유형일까?') + cdT(540, 372, 38, '#000', '그림 30장만 고르면 너의 색이 겹쳐 그려져요');
+      o += cdRadar([{ s: s, col: cu.c, fill: cu.f }], 540, 700, 185);
+      if (key !== 'BAL') { chips.push({ t: '1순위 ' + AX[r[0]].n + ' ' + s[r[0]], bg: cu.c, fg: cu.t }, { t: '2순위 ' + AX[r[1]].n + ' ' + s[r[1]], bg: cu.c, fg: cu.t }); } else { chips.push({ t: '다섯 영역 점수가 비슷함', bg: '#007A33', fg: '#fff' }); }
       c = cdChips(chips, 985); o += c.svg + foot('나랑 같이 해 볼래?', '그림 카드만 고르면 끝 · 무료 · 한국뇌궁합연구소');
     } else if ((S.screen === 'pair' || (S.screen === 'gres' && S.group && S.group.n === 2))) {
       var g = S.group, a = g ? g.res[0] : S.inv, b = g ? g.res[1] : S.me, pct = overlap(a.s, b.s), items = [], an, bn, deg;
       an = g ? (a.nick || 'A').slice(0, 5) : '너'; bn = g ? (b.nick || 'B').slice(0, 5) : '나';
-      o += dot(230, '#0033CC') + cdT(280, 98, 52, '#000', '파랑은 ' + an, 'start') + dot(660, '#E00000') + cdT(710, 98, 52, '#000', '빨강은 ' + bn, 'start');
+      var pc2 = pairCols(a.col, b.col), ua2 = ucol(pc2[0]), ub2 = ucol(pc2[1]);
+      var t1 = ua2.n + ua2.j + ' ' + an, t2 = ub2.n + ub2.j + ' ' + bn, fs2 = Math.min(52, Math.floor(350 / Math.max(t1.length, t2.length)));
+      o += dot(210, ua2.c) + cdT(260, 98, fs2, '#000', t1, 'start') + dot(640, ub2.c) + cdT(690, 98, fs2, '#000', t2, 'start');
       deg = pct * 3.6;
       o += '<circle cx="250" cy="250" r="64" fill="none" stroke="#D5DCF5" stroke-width="26"/><circle cx="250" cy="250" r="64" fill="none" stroke="#FFB000" stroke-width="26" stroke-linecap="round" stroke-dasharray="' + (402.1 * pct / 100).toFixed(1) + ' 402.1" transform="rotate(-90 250 250)"/>' + cdT(250, 264, 40, '#000', pct + '%');
       o += cdT(360, 246, 46, '#000', '닮고 다른 균형 조합', 'start') + cdT(360, 292, 32, '#000', '점수 패턴 겹침률', 'start');
-      o += cdRadar([{ s: a.s, col: '#0033CC', fill: 'rgba(0,51,204,.22)' }, { s: b.s, col: '#E00000', fill: 'rgba(224,0,0,.2)' }], 540, 590, 165);
+      o += cdRadar([{ s: a.s, col: ua2.c, fill: ua2.f }, { s: b.s, col: ub2.c, fill: ub2.f }], 540, 590, 165);
       for (k = 0; k < 5; k++) { var kd = pairKind(a.s[k], b.s[k]); items.push({ t: AX[k].n + ' ' + KIND[kd], bg: kd === 'big' ? '#E65100' : (kd === 'some' ? '#FFD400' : '#007A33'), fg: kd === 'some' ? '#000' : '#fff', o: kd === 'big' ? 0 : (kd === 'some' ? 1 : 2) }); }
       items.sort(function (x, y) { return x.o - y.o; });
       c = cdChips(items, 815); o += c.svg + cdT(540, 815 + c.h + 52, 40, '#000', '우리, 어디서 부딪히는지 한눈에 보여요');
@@ -1325,7 +1338,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 1080, 1350); ctx.drawImage(img, 0, 0, 1080, 1350);
       c.toBlob(function (bl) {
         if (!bl) { toast('이미지를 만들지 못했어요'); return; }
-        var url = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age), f = null;
+        var url = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age, S.me.col), f = null;
         try { f = new File([bl], 'brain-match-card.png', { type: 'image/png' }); } catch (e1) { f = null; }
         track('card_make', { kind: S.screen === 'result' ? 'solo' : 'pair' });
         if (f && navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share({ files: [f], title: T('한국뇌궁합연구소'), text: shareText() + ' ' + url }).catch(function () { }); }
@@ -1406,6 +1419,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     for (i = 0; i < g.n; i++) {
       e = document.getElementById('gn' + i); if (e) { g.people[i].nick = e.value.trim().slice(0, 10); }
       e = document.getElementById('ga' + i); if (e) { g.people[i].age = Number(e.value); }
+      e = document.getElementById('gc' + i); if (e) { g.people[i].col = UCOL[e.value] ? e.value : 'y'; }
     }
     ad = document.getElementById('gadult'); if (ad) { S.adult = !!ad.checked; }
   }
@@ -1426,7 +1440,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       return;
     } else if (a === 'gopen') {
       var gn = Number(v), gi; S.group = { n: gn, hub: gn === 3 ? 'friend' : 'couple', people: [], res: [], idx: 0 };
-      for (gi = 0; gi < gn; gi++) { S.group.people.push({ nick: '', age: 9 }); }
+      for (gi = 0; gi < gn; gi++) { S.group.people.push({ nick: '', age: 9, col: 'y' }); }
       S.screen = 'gsetup'; track('group_open', { n: gn });
     } else if (a === 'ghub') {
       readG(); S.group.hub = v;
@@ -1435,10 +1449,10 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       if (!S.adult) { toast('만 18세 이상만 이용할 수 있어요. 확인 칸을 눌러 주세요'); return; }
       var gg = S.group, q;
       for (q = 0; q < gg.n; q++) { if (!gg.people[q].nick) { gg.people[q].nick = PNM[q]; } }
-      gg.res = []; gg.idx = 0; S.hub = gg.hub; S.nick = gg.people[0].nick; S.age = gg.people[0].age;
+      gg.res = []; gg.idx = 0; S.hub = gg.hub; S.nick = gg.people[0].nick; S.age = gg.people[0].age; S.col = gg.people[0].col || 'y';
       S.deck = newDeck(); gg.decks = [S.deck]; S.qi = 0; S.ans = []; S.screen = 'quiz'; track('group_start', { n: gg.n });
     } else if (a === 'gbegin') {
-      var g2 = S.group; g2.idx++; S.nick = g2.people[g2.idx].nick; S.age = g2.people[g2.idx].age;
+      var g2 = S.group; g2.idx++; S.nick = g2.people[g2.idx].nick; S.age = g2.people[g2.idx].age; S.col = g2.people[g2.idx].col || 'y';
       S.deck = newDeck(g2.decks); g2.decks.push(S.deck); S.qi = 0; S.ans = []; S.screen = 'quiz';
     } else if (a === 'gme') {
       S.me = S.group.res[Number(v)]; S.screen = 'result';
@@ -1450,6 +1464,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       S.hub = S.inv ? S.inv.hub : v; S.screen = 'intro'; track('test_start', { hub: S.hub });
     } else if (a === 'begin') {
       var n = document.getElementById('nick'); S.nick = n ? n.value.trim().slice(0, 10) : '';
+      var cs0 = document.getElementById('colsel'); if (cs0) { S.col = UCOL[cs0.value] ? cs0.value : 'y'; }
       var ad = document.getElementById('adult'); S.adult = !!(ad && ad.checked);
       if (!S.adult) { toast('만 18세 이상만 이용할 수 있어요. 확인 칸을 눌러 주세요'); return; }
       S.deck = newDeck(); S.qi = 0; S.ans = []; S.screen = 'quiz';
@@ -1457,35 +1472,37 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       S.cg = v;
     } else if (a === 'age') {
       var n2 = document.getElementById('nick'); if (n2) { S.nick = n2.value.trim().slice(0, 10); }
+      var cs2 = document.getElementById('colsel'); if (cs2) { S.col = UCOL[cs2.value] ? cs2.value : 'y'; }
       var ad2 = document.getElementById('adult'); if (ad2) { S.adult = !!ad2.checked; }
       S.age = Number(v);
     } else if (a === 'lang') {
       if (S.group && S.screen === 'gsetup') { readG(); }
       LANG = (v === 'ko' || v === 'en' || v === 'ja' || v === 'ru' || v === 'uz') ? v : ((LANG === 'ko') ? 'en' : 'ko'); setCF(); try { localStorage.setItem('kbm_lang', LANG); } catch (eS) { }
       var n3 = document.getElementById('nick'); if (n3) { S.nick = n3.value.trim().slice(0, 10); }
+      var cs3 = document.getElementById('colsel'); if (cs3) { S.col = UCOL[cs3.value] ? cs3.value : 'y'; }
       var ad3 = document.getElementById('adult'); if (ad3) { S.adult = !!ad3.checked; }
     } else if (a === 'rate') {
       S.ans[S.qi] = Number(v); track('question_answer', { q: S.qi });
       if (S.qi >= questionsFor().length - 1 && S.group) {
-        var g3 = S.group; g3.res[g3.idx] = { s: scoreOf(S.hub, S.ans), raw: rawOf(S.ans), nick: S.nick, age: S.age };
+        var g3 = S.group; g3.res[g3.idx] = { s: scoreOf(S.hub, S.ans), raw: rawOf(S.ans), nick: S.nick, age: S.age, col: S.col };
         S.screen = (g3.idx >= g3.n - 1) ? 'gres' : 'gnext'; track('group_person_done', { i: g3.idx });
       } else if (S.qi >= questionsFor().length - 1) {
-        S.me = { s: scoreOf(S.hub, S.ans), raw: rawOf(S.ans), nick: S.nick, age: S.age }; S.screen = 'result'; track('test_complete', { hub: S.hub, age: S.age });
+        S.me = { s: scoreOf(S.hub, S.ans), raw: rawOf(S.ans), nick: S.nick, age: S.age, col: S.col }; S.screen = 'result'; track('test_complete', { hub: S.hub, age: S.age });
       } else { S.qi++; }
     } else if (a === 'back') {
       if (S.qi > 0) { S.qi--; } else if (!S.group) { S.screen = 'intro'; } else if (S.group.idx === 0) { S.screen = 'gsetup'; }
     } else if (a === 'pair') {
       S.screen = 'pair'; track('pair_result_view');
     } else if (a === 'copy') {
-      track('invite_created'); copyText(inviteLink(S.hub, S.me.s, S.me.nick, S.me.age)); return;
+      track('invite_created'); copyText(inviteLink(S.hub, S.me.s, S.me.nick, S.me.age, S.me.col)); return;
     } else if (a === 'tg') {
       track('share_tg');
-      var url2 = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age);
+      var url2 = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age, S.me.col);
       try { window.open('https://t.me/share/url?url=' + encodeURIComponent(url2) + '&text=' + encodeURIComponent(shareText()), '_blank'); } catch (eT) { copyText(url2); }
       return;
     } else if (a === 'kcopy') {
       track('share_kcopy');
-      var url3 = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age);
+      var url3 = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age, S.me.col);
       copyText(shareText() + '\n' + url3); return;
     } else if (a === 'install') {
       track('pwa_install_click');
@@ -1495,13 +1512,13 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       makeCard(); return;
     } else if (a === 'share') {
       track('share_click');
-      var url = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age);
+      var url = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age, S.me.col);
       if (navigator.share) { navigator.share({ title: T('한국뇌궁합연구소'), text: shareText(), url: url }).catch(function () { }); } else { copyText(url); }
       return;
     } else if (a === 'retry') {
       S.screen = 'intro';
     } else if (a === 'home') {
-      S.screen = 'home'; S.hub = null; S.deck = null; S.qi = 0; S.ans = []; S.me = null; S.group = null;
+      S.screen = 'home'; S.hub = null; S.deck = null; S.qi = 0; S.ans = []; S.me = null; S.group = null; S.col = 'y';
     } else if (a === 'goto') {
       if (S.screen !== 'home') { S.screen = 'home'; render(); }
       var el = document.getElementById(v);
