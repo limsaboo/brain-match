@@ -1012,7 +1012,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
         '<p>링크를 받은 사람이 그림 30장에 점수를 주면 둘의 결과가 나옵니다.</p>' +
         '<input class="txt" id="lnk" readonly value="' + esc(link) + '">' +
         '<button class="btn red" data-act="copy">초대 링크 복사</button>' +
-        '<button class="btn blue" data-act="share">공유하기</button>' + '<button class="btn kk" data-act="kcopy">' + LN('카톡에 붙여넣을 문구 복사', 'Copy message to paste in chat', 'チャット用メッセージをコピー', { ru: 'Скопировать сообщение для чата', uz: 'Chat uchun xabarni nusxalash' }) + '</button>' + ((LANG === 'ru' || LANG === 'uz') ? '<button class="btn" style="background:#229ED9;color:#fff" data-act="tg">Telegram</button>' : '') + '</div>';
+        '<button class="btn blue" data-act="share">공유하기</button>' + '<button class="btn red" data-act="card">' + LN('공유 카드 이미지 만들기', 'Make a share card') + '</button>' + '<button class="btn kk" data-act="kcopy">' + LN('카톡에 붙여넣을 문구 복사', 'Copy message to paste in chat', 'チャット用メッセージをコピー', { ru: 'Скопировать сообщение для чата', uz: 'Chat uchun xabarni nusxalash' }) + '</button>' + ((LANG === 'ru' || LANG === 'uz') ? '<button class="btn" style="background:#229ED9;color:#fff" data-act="tg">Telegram</button>' : '') + '</div>';
     }
     h += moreCard();
     h += installCard();
@@ -1055,7 +1055,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       '<div class="sayb">' + esc(an) + ': "' + esc(ta.say) + '"</div><div class="sayb">' + esc(bn) + ': "' + esc(tb.say) + '"</div></div>';
     h += '<div class="card c3"><b class="t">이번 주 둘이 해 볼 미션</b><div class="sayb">' + esc(AX[weakest].tip) + '</div></div>';
     h += '<div class="card c1"><b class="t">근거와 한계</b><p style="font-size:15px">겹침률은 두 사람의 영역별 점수 차이의 평균을 100에서 뺀 값(100 − 점수 차이 합 ÷ 5)이며, 관계의 좋고 나쁨이나 미래를 예측하지 않습니다. 영역 설명의 근거 문헌은 개인 보고서의 문헌 목록과 같습니다.</p></div>';
-    h += '<div class="card cy"><b class="t">' + LN('뇌궁합 인증서 선물하기', 'Gift a Brain Match Certificate') + '</b><p>' + LN('레이더·유형 이름·요약이 담긴 카드에 한국뇌심리연구소 소장 인장을 찍어 드려요.', 'A card with the radar, type name and summary, stamped with the director\'s seal.') + '</p><button class="btn red" data-act="cert">' + LN('인증서 만들기', 'Make the certificate') + '</button></div>' + '<button class="btn blue" data-act="share">이 결과 공유하기</button>' + (g ? groupBtns(g) : '') + '<button class="btn ghost" data-act="home">처음으로</button></div>';
+    h += '<div class="card cy"><b class="t">' + LN('뇌궁합 인증서 선물하기', 'Gift a Brain Match Certificate') + '</b><p>' + LN('레이더·유형 이름·요약이 담긴 카드에 한국뇌심리연구소 소장 인장을 찍어 드려요.', 'A card with the radar, type name and summary, stamped with the director\'s seal.') + '</p><button class="btn red" data-act="cert">' + LN('인증서 만들기', 'Make the certificate') + '</button></div>' + '<button class="btn red" data-act="card">' + LN('공유 카드 이미지 만들기', 'Make a share card') + '</button>' + '<button class="btn blue" data-act="share">이 결과 공유하기</button>' + (g ? groupBtns(g) : '') + '<button class="btn ghost" data-act="home">처음으로</button></div>';
     h += moreCard();
     return h;
   }
@@ -1263,6 +1263,79 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     document.body.appendChild(a); a.click(); a.parentNode.removeChild(a); toast('이미지를 저장했어요');
   }
 
+  /* 공유 카드 이미지: 혼자 결과 = 초대 카드(파랑은 나), 두 사람 결과 = 파랑/빨강 비교 카드 */
+  var CARDFONT = "'Noto Sans KR','Noto Sans CJK KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif";
+  function cdT(x, y, size, fill, txt, anchor) { return '<text x="' + x + '" y="' + y + '" font-size="' + size + '" font-weight="900" fill="' + fill + '" text-anchor="' + (anchor || 'middle') + '" font-family="' + CARDFONT + '">' + esc(txt) + '</text>'; }
+  function cdRadar(series, cx, cy, R) {
+    var o = '', i, v, lv, pts, a, x, y, pt = function (k, val, r) { var an = -Math.PI / 2 + k * 2 * Math.PI / 5; return [cx + r * val / 100 * Math.cos(an), cy + r * val / 100 * Math.sin(an)]; };
+    for (lv = 100; lv >= 25; lv -= 25) { pts = []; for (i = 0; i < 5; i++) { pts.push(pt(i, lv, R).map(function (n) { return n.toFixed(1); }).join(',')); } o += '<polygon points="' + pts.join(' ') + '" fill="' + (lv === 100 ? '#fff' : 'none') + '" stroke="#7A86B8" stroke-width="3"/>'; }
+    for (i = 0; i < 5; i++) { a = pt(i, 100, R); o += '<line x1="' + cx + '" y1="' + cy + '" x2="' + a[0].toFixed(1) + '" y2="' + a[1].toFixed(1) + '" stroke="#B8C0E0" stroke-width="2"/>'; }
+    for (v = 0; v < series.length; v++) {
+      pts = []; for (i = 0; i < 5; i++) { pts.push(pt(i, series[v].s[i], R).map(function (n) { return n.toFixed(1); }).join(',')); }
+      o += '<polygon points="' + pts.join(' ') + '" fill="' + series[v].fill + '" stroke="' + series[v].col + '" stroke-width="8" stroke-linejoin="round"/>';
+      for (i = 0; i < 5; i++) { a = pt(i, series[v].s[i], R); o += '<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="11" fill="' + series[v].col + '" stroke="#fff" stroke-width="4"/>'; }
+    }
+    for (i = 0; i < 5; i++) { a = pt(i, 100, R + 52); x = a[0] + (i === 1 || i === 2 ? -30 : (i >= 3 ? 30 : 0)); o += cdT(x.toFixed(1), (a[1] + 11).toFixed(1), 34, '#000', AX[i].n, i === 0 ? 'middle' : (i <= 2 ? 'start' : 'end')); }
+    return o;
+  }
+  function cdChips(items, y) {
+    var rows = [[]], w = [0], cur = 0, i, wd, o = '', x, r;
+    for (i = 0; i < items.length; i++) { wd = items[i].t.length * 31 + 56; if (w[cur] + wd > 940 && rows[cur].length) { rows.push([]); w.push(0); cur++; } items[i].w = wd; rows[cur].push(items[i]); w[cur] += wd + (rows[cur].length > 1 ? 14 : 0); }
+    for (r = 0; r < rows.length; r++) { x = (1080 - w[r]) / 2; for (i = 0; i < rows[r].length; i++) { o += '<rect x="' + x.toFixed(1) + '" y="' + (y + r * 68) + '" width="' + rows[r][i].w + '" height="56" rx="28" fill="' + rows[r][i].bg + '" stroke="#000" stroke-width="5"/>' + cdT((x + rows[r][i].w / 2).toFixed(1), y + r * 68 + 39, 30, rows[r][i].fg, rows[r][i].t); x += rows[r][i].w + 14; } }
+    return { svg: o, h: rows.length * 68 };
+  }
+  function shareCardSvg() {
+    var o = '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">' +
+      '<rect x="0" y="0" width="1080" height="1350" fill="#fff"/><rect x="5" y="5" width="1070" height="1340" rx="44" fill="#EAF0FF" stroke="#000" stroke-width="10"/>' +
+      '<path d="M10 54 Q10 10 54 10 L1026 10 Q1070 10 1070 54 L1070 150 L10 150 Z" fill="#FFD400"/><line x1="10" y1="150" x2="1070" y2="150" stroke="#000" stroke-width="10"/>';
+    var foot = function (l1, l2) {
+      return '<path d="M10 1110 L1070 1110 L1070 1296 Q1070 1340 1026 1340 L54 1340 Q10 1340 10 1296 Z" fill="#000"/>' +
+        cdT(60, 1180, 50, '#FFD400', l1, 'start') + cdT(60, 1236, 32, '#fff', l2, 'start') + cdT(60, 1290, 32, '#FFD400', 'limsaboo.github.io/brain-match', 'start');
+    };
+    var dot = function (x, col) { return '<circle cx="' + x + '" cy="80" r="26" fill="' + col + '" stroke="#000" stroke-width="6"/>'; };
+    var k, c;
+    if (S.screen === 'result' && S.me) {
+      var s = S.me.s, key = typeKey(s), t = TYPES[key], r = rankOf(s), chips = [];
+      o += dot(360, '#0033CC') + cdT(410, 98, 58, '#000', '파랑은 나', 'start');
+      o += cdT(540, 250, 56, '#000', '나는 \'' + t.name + '\' 유형!');
+      o += cdT(540, 322, 38, '#000', '너는 어떤 유형일까?') + cdT(540, 372, 38, '#000', '그림 30장만 고르면 빨강이 겹쳐 그려져요');
+      o += cdRadar([{ s: s, col: '#0033CC', fill: 'rgba(0,51,204,.25)' }], 540, 700, 185);
+      if (key !== 'BAL') { chips.push({ t: '1순위 ' + AX[r[0]].n + ' ' + s[r[0]], bg: '#0033CC', fg: '#fff' }, { t: '2순위 ' + AX[r[1]].n + ' ' + s[r[1]], bg: '#0033CC', fg: '#fff' }); } else { chips.push({ t: '다섯 영역 점수가 비슷함', bg: '#007A33', fg: '#fff' }); }
+      c = cdChips(chips, 985); o += c.svg + foot('나랑 같이 해 볼래?', '그림 카드만 고르면 끝 · 무료 · 한국뇌궁합연구소');
+    } else if ((S.screen === 'pair' || (S.screen === 'gres' && S.group && S.group.n === 2))) {
+      var g = S.group, a = g ? g.res[0] : S.inv, b = g ? g.res[1] : S.me, pct = overlap(a.s, b.s), items = [], an, bn, deg;
+      an = g ? (a.nick || 'A').slice(0, 5) : '너'; bn = g ? (b.nick || 'B').slice(0, 5) : '나';
+      o += dot(230, '#0033CC') + cdT(280, 98, 52, '#000', '파랑은 ' + an, 'start') + dot(660, '#E00000') + cdT(710, 98, 52, '#000', '빨강은 ' + bn, 'start');
+      deg = pct * 3.6;
+      o += '<circle cx="250" cy="250" r="64" fill="none" stroke="#D5DCF5" stroke-width="26"/><circle cx="250" cy="250" r="64" fill="none" stroke="#FFB000" stroke-width="26" stroke-linecap="round" stroke-dasharray="' + (402.1 * pct / 100).toFixed(1) + ' 402.1" transform="rotate(-90 250 250)"/>' + cdT(250, 264, 40, '#000', pct + '%');
+      o += cdT(360, 246, 46, '#000', '닮고 다른 균형 조합', 'start') + cdT(360, 292, 32, '#000', '점수 패턴 겹침률', 'start');
+      o += cdRadar([{ s: a.s, col: '#0033CC', fill: 'rgba(0,51,204,.22)' }, { s: b.s, col: '#E00000', fill: 'rgba(224,0,0,.2)' }], 540, 590, 165);
+      for (k = 0; k < 5; k++) { var kd = pairKind(a.s[k], b.s[k]); items.push({ t: AX[k].n + ' ' + KIND[kd], bg: kd === 'big' ? '#E65100' : (kd === 'some' ? '#FFD400' : '#007A33'), fg: kd === 'some' ? '#000' : '#fff', o: kd === 'big' ? 0 : (kd === 'some' ? 1 : 2) }); }
+      items.sort(function (x, y) { return x.o - y.o; });
+      c = cdChips(items, 815); o += c.svg + cdT(540, 815 + c.h + 52, 40, '#000', '우리, 어디서 부딪히는지 한눈에 보여요');
+      o += foot('너도 나랑 해 볼래?', '그림 카드만 고르면 끝 · 무료 · 한국뇌궁합연구소');
+    } else { return ''; }
+    return o + '</svg>';
+  }
+  function makeCard() {
+    var svg = shareCardSvg(), img = new Image();
+    if (!svg) { toast('결과 화면에서 눌러 주세요'); return; }
+    img.onload = function () {
+      var c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+      var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 1080, 1350); ctx.drawImage(img, 0, 0, 1080, 1350);
+      c.toBlob(function (bl) {
+        if (!bl) { toast('이미지를 만들지 못했어요'); return; }
+        var url = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age), f = null;
+        try { f = new File([bl], 'brain-match-card.png', { type: 'image/png' }); } catch (e1) { f = null; }
+        track('card_make', { kind: S.screen === 'result' ? 'solo' : 'pair' });
+        if (f && navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share({ files: [f], title: T('한국뇌궁합연구소'), text: shareText() + ' ' + url }).catch(function () { }); }
+        else { var a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'brain-match-card.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast('카드 이미지를 저장했어요'); }
+      }, 'image/png');
+    };
+    img.onerror = function () { toast('이미지를 만들지 못했어요'); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+
   function vFoot() {
     return '<div class="fl">' + logoSvg(46) + '<b><small>KOREA BRAIN MATCHING INSTITUTE</small>한국뇌궁합연구소</b></div>' +
       '<b class="y">한국뇌심리연구소 브랜드 계열 서비스</b><br>' +
@@ -1418,6 +1491,8 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       track('pwa_install_click');
       if (DEFERRED) { try { DEFERRED.prompt(); } catch (eI) { } DEFERRED = null; } else { toast(LN('위 순서대로 눌러 주세요', 'Please follow the steps above', '上の手順でタップしてください', { ru: 'Следуйте шагам выше', uz: 'Yuqoridagi qadamlarga amal qiling' })); }
       return;
+    } else if (a === 'card') {
+      makeCard(); return;
     } else if (a === 'share') {
       track('share_click');
       var url = (S.inv || S.group) ? base() : inviteLink(S.hub, S.me.s, S.me.nick, S.me.age);
