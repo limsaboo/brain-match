@@ -369,6 +369,20 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     BAL: { name: '고른 조화형', line: '다섯 영역을 고르게 쓰는 유연한 사람', like: '상황에 맞춰 함께 균형을 잡아 주는 사람', clash: '한쪽 방식만 강요받을 때', say: '이번엔 네 방식으로, 다음엔 내 방식으로 해 보자.' }
   };
 
+  var DEEP = {
+    '속 깊은 설계자': ['생각을 정리할 시간이 필요할 때 조용해질 수 있어요.', '즉흥성보다 계획을 존중하는 사람에게 편안함을 느낄 수 있어요.', '달라진 선택을 비교하며 나만의 계획 습관을 살펴보세요.'],
+    '계산된 모험가': ['가능성과 현실 조건을 함께 따지느라 잠시 조용해질 수 있어요.', '도전을 응원하면서도 현실적인 대화를 나누는 사람에게 끌릴 수 있어요.', '새 시도와 신중한 판단 사이에서 달라진 점을 찾아보세요.'],
+    '신중한 지킴이': ['익숙한 방식이 갑자기 바뀌면 먼저 상황을 살필 수 있어요.', '속도를 재촉하지 않고 믿음을 쌓는 사람과 편할 수 있어요.', '새로운 선택을 대하는 마음이 어떻게 달라졌는지 확인해 보세요.'],
+    '아이디어 전략가': ['생각이 여러 갈래로 뻗어 우선순위를 고르는 중일 수 있어요.', '아이디어를 함께 구체화하고 실행 순서를 의논하는 사람에게 끌릴 수 있어요.', '떠올린 아이디어 중 실제로 시도한 것이 무엇인지 돌아보세요.'],
+    '열정 공감러': ['마음이 크게 움직인 뒤 감정을 가라앉힐 시간이 필요할 수 있어요.', '감정을 나누고 열정을 함께 즐기는 사람에게 편안함을 느낄 수 있어요.', '무엇에 에너지를 쓰고 싶은지 달라진 마음을 비교해 보세요.'],
+    '포근한 보호자': ['주변을 챙기느라 자신의 생각을 뒤로 미룰 수 있어요.', '배려를 당연하게 여기지 않고 고마움을 표현하는 사람과 편할 수 있어요.', '다른 사람과 나를 챙기는 균형이 어떻게 달라졌는지 살펴보세요.'],
+    '감성 몽상가': ['느낌을 말로 옮기기보다 마음속에서 장면을 그릴 수 있어요.', '상상과 감정을 서두르지 않고 들어주는 사람에게 끌릴 수 있어요.', '새롭게 마음에 남은 장면과 아이디어를 비교해 보세요.'],
+    '균형 개척자': ['바꾸고 싶은 점과 지키고 싶은 점을 함께 살피는 중일 수 있어요.', '안정과 변화를 모두 존중하는 사람과 대화가 편할 수 있어요.', '무엇을 유지하고 무엇을 바꾸었는지 돌아보세요.'],
+    '자유로운 발명가': ['기존 방식보다 다른 방법을 떠올리느라 잠시 집중할 수 있어요.', '새로운 시도를 막기보다 함께 실험해 주는 사람에게 끌릴 수 있어요.', '평소와 다르게 시도한 선택이 있었는지 찾아보세요.'],
+    '차분한 예술가': ['작은 분위기 변화나 세부를 조용히 관찰할 수 있어요.', '서두르지 않고 취향과 섬세한 감각을 존중하는 사람과 편할 수 있어요.', '일상에서 새롭게 발견한 취향과 차이를 기록해 보세요.'],
+    '고른 조화형': ['여러 사람의 입장을 살피며 적절한 말을 고르는 중일 수 있어요.', '서로 다른 의견을 편하게 조율하는 사람에게 안정감을 느낄 수 있어요.', '상황에 따라 달라진 선택과 균형점을 비교해 보세요.']
+  };
+
   var BIZ = { name: '통아저씨', ceo: '임찬우', addr: '서울특별시 양천구 남부순환로69길 15, 1층(신월동)', reg: '608-54-02294', mail: '제2025-서울양천-0915호', email: 'brain.saboo@gmail.com' };
 
   /* =========================================================
@@ -1516,7 +1530,8 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
   }
   function deepCard(t) {
     var items = ['「' + t.name + '」가 갑자기 말이 없어지는 순간', '나와 가장 잘 맞는 유형 TOP 3', '3개월 뒤 다시 하면 달라지는 점'], h = '<div class="card cy"><b class="t">🔒 ' + LN('잠긴 깊이 보기', 'Locked deep dive') + '</b><p>' + LN('가장 궁금한 한 가지를 눌러 주세요. 눌러 주신 순서대로 먼저 만들어요.', 'Tap the one you want most. We build the most tapped first.') + '</p>';
-    items.forEach(function (q, i) { h += '<button class="btn ghost" data-act="deep" data-v="' + i + '" style="text-align:left;font-weight:900;border:3px solid #000">🔒 ' + esc(LN(q, ['Why this type goes quiet suddenly', 'Your top 3 matching types', 'What changes when you retake in 3 months'][i])) + '</button>'; });
+    var pv = (LANG === 'ko' && DEEP[t.name]) || null;
+    items.forEach(function (q, i) { h += '<button class="btn ghost" data-act="deep" data-v="' + i + '" style="text-align:left;font-weight:900;border:3px solid #000;line-height:1.7"><span style="display:flex;gap:8px;align-items:flex-start"><span>🔒</span><span>' + esc(LN(q, ['Why this type goes quiet suddenly', 'Your top 3 matching types', 'What changes when you retake in 3 months'][i])) + '</span></span>' + (pv ? '<span style="display:block;font-weight:700;font-size:.92em;color:#333;margin-top:6px">미리보기 · ' + esc(pv[i]) + ' <b style="color:#E60012">…더 보기</b></span>' : '') + '</button>'; });
     return h + '</div>';
   }
 
