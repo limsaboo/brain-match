@@ -780,7 +780,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       ST.t0 = Date.now();
     }
     else if (name === 'group_open' || name === 'invite_created' || name === 'share_click' || name === 'share_tg' || name === 'share_kcopy' || name === 'card_make' || name === 'cert_open' || name === 'cert_save' || name === 'cert_share' || name === 'pair_result_view' || name === 'pwa_install_click' || name === 'interest_click') {
-      statSend(name, { hub: S.hub, mode: statMode(), p: (name === 'group_open' && d) ? { n: d.n } : null });
+      statSend(name, { hub: S.hub, mode: statMode(), p: (name === 'group_open' && d) ? { n: d.n } : (((name === 'interest_click' || name === 'card_make') && d) ? { k: String(d.k || d.kind || d.v || '').slice(0, 24), i: (d.i === undefined ? null : d.i) } : null) });
     }
   }
   function track(name, data) { (window.__events = window.__events || []).push({ e: name, d: data || {}, t: Date.now() }); try { statTrack(name, data); } catch (eT) { } }
@@ -1089,6 +1089,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     for (bk = 1; bk < 5; bk++) { if (topPct(s[bk], ref.v[bk]) < topPct(s[bt], ref.v[bt])) { bt = bk; } }
     if (topPct(s[bt], ref.v[bt]) <= 50) { h += '<span class="tag" style="background:#B45309">또래 상위 ' + topPct(s[bt], ref.v[bt]) + '% · ' + AX[bt].n + '(예상)</span>'; }
     h += '</div>';
+    h += '<button class="btn red" data-act="braincard" style="margin:6px 0 14px">' + LN('내 뇌 카드 저장하기', 'Save my brain card') + '</button>';
     h += '<div class="card c1"><b class="t">뇌 성향 점수 레이더</b><p>바깥쪽일수록 점수가 높아요.</p>' +
       radarSvg([{ v: s, col: ucol(me.col).c, fill: ucol(me.col).f }, { v: ref.v, col: '#111', fill: 'none', dash: true }], true, ['나', '평균']) +
       '<p style="font-size:15px"><span class="lab" style="background:' + ucol(me.col).c + ';color:' + ucol(me.col).t + '">실선 · 나</span> <span class="lab" style="background:#111">점선 · ' + esc(ref.label) + '</span> </p></div>';
@@ -1103,6 +1104,7 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     h += '<div class="card c5"><b class="t">가장 높은 영역과 가장 낮은 영역</b>' +
       '<p><span class="lab" style="background:' + AX[r[0]].col + '">가장 높음</span> ' + AX[r[0]].n + ' ' + s[r[0]] + '점</p>' +
       '<p><span class="lab" style="background:' + AX[r[4]].col + '">가장 낮음</span> ' + AX[r[4]].n + ' ' + s[r[4]] + '점</p></div>';
+    h += deepCard(t);
     for (k = 0; k < 5; k++) {
       var lv = levelOf(s[k]);
       h += '<div class="card c' + (k + 1) + '"><img class="ban" src="' + BAN[AX[k].k] + '" alt="' + AX[k].n + ' 영역 카드" width="660" height="300"><b class="t" style="color:' + AX[k].col + '">' + AX[k].n + ' · ' + LV[lv] + ' (' + s[k] + '점 · ' + REFLBL + ' 대비 ' + sgn(diff[k]) + ')</b>' +
@@ -1470,6 +1472,54 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
 
+  /* 내 뇌 카드: 세로 1080x1920 저장용 카드 (점수 기반 카드 코드, 서버 번호 아님) */
+  function cardCode(sc) { var h = 7, i; for (i = 0; i < sc.length; i++) { h = (h * 31 + sc[i] * (i + 3)) % 1679616; } var c = h.toString(36).toUpperCase(); while (c.length < 4) { c = '0' + c; } return 'KBM-' + c; }
+  function brainCardSvg() {
+    if (!S.me || !S.me.s) { return ''; }
+    var me = S.me, s = me.s, key = typeKey(s), t = TYPES[key], r = rankOf(s), cu = ucol(me.col), o = '', k, x, d = new Date(), ds = d.getFullYear() + '.' + pad2(d.getMonth() + 1) + '.' + pad2(d.getDate());
+    var nm = T(t.name), ls = wrapTxt(T(t.line), 26).slice(0, 3);
+    o += '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920"><rect width="1080" height="1920" fill="#FFD400"/>';
+    o += '<rect x="50" y="130" width="980" height="1660" rx="64" fill="#fff" stroke="#000" stroke-width="10"/>';
+    o += '<rect x="50" y="130" width="980" height="150" rx="64" fill="#E00000" stroke="#000" stroke-width="10"/><rect x="55" y="215" width="970" height="65" fill="#E00000"/><line x1="55" y1="280" x2="1025" y2="280" stroke="#000" stroke-width="10"/>';
+    o += cdT(540, 232, 56, '#fff', LN('내 뇌 카드', 'MY BRAIN CARD'));
+    o += cdT(540, 410, nm.length > 8 ? 84 : 104, '#000', nm);
+    ls.forEach(function (q, i) { o += cdT(540, 490 + i * 56, 40, '#222', q); });
+    if (me.nick) { o += cdT(540, 664, 38, cu.c, me.nick.slice(0, 8)); }
+    o += cdRadar([{ s: s, col: cu.c, fill: cu.f }], 540, 990, 290);
+    for (k = 0; k < 5; k++) {
+      x = 70 + k * 190;
+      o += '<rect x="' + x + '" y="1380" width="180" height="150" rx="26" fill="' + AX[k].col + '" stroke="#000" stroke-width="5"/>';
+      o += cdT(x + 90, 1436, 34, '#fff', T(AX[k].n)) + cdT(x + 90, 1500, 60, '#fff', String(s[k]));
+    }
+    if (key !== 'BAL') { o += cdT(540, 1610, 44, '#000', LN('1순위 ' + AX[r[0]].n + ' · 2순위 ' + AX[r[1]].n, 'Top: ' + T(AX[r[0]].n) + ' · ' + T(AX[r[1]].n))); }
+    o += cdT(540, 1690, 40, '#E00000', LN('나도 해보기 · limsaboo.github.io/brain-match', 'Try it · limsaboo.github.io/brain-match'));
+    o += cdT(100, 1750, 34, '#000', cardCode(s), 'start') + cdT(980, 1750, 34, '#000', ds, 'end');
+    o += cdT(540, 1860, 38, '#000', LN('한국뇌궁합연구소 · 재미로 보는 자기이해', 'Korea Brain Matching Institute'));
+    return o + '</svg>';
+  }
+  function makeBrainCard() {
+    var svg = brainCardSvg(), img = new Image();
+    if (!svg) { toast('결과 화면에서 눌러 주세요'); return; }
+    track('card_make', { kind: 'brain_card' });
+    img.onload = function () {
+      var c = document.createElement('canvas'); c.width = 1080; c.height = 1920;
+      var ctx = c.getContext('2d'); ctx.fillStyle = '#FFD400'; ctx.fillRect(0, 0, 1080, 1920); ctx.drawImage(img, 0, 0, 1080, 1920);
+      c.toBlob(function (bl) {
+        if (!bl) { toast('이미지를 만들지 못했어요'); return; }
+        var f = null; try { f = new File([bl], 'my-brain-card.png', { type: 'image/png' }); } catch (e1) { f = null; }
+        if (f && navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share({ files: [f], title: T('한국뇌궁합연구소'), text: shareText() }).catch(function () { }); }
+        else { var a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'my-brain-card.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a); toast('내 뇌 카드를 저장했어요'); }
+      }, 'image/png');
+    };
+    img.onerror = function () { toast('이미지를 만들지 못했어요'); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+  function deepCard(t) {
+    var items = ['「' + t.name + '」가 갑자기 말이 없어지는 순간', '나와 가장 잘 맞는 유형 TOP 3', '3개월 뒤 다시 하면 달라지는 점'], h = '<div class="card cy"><b class="t">🔒 ' + LN('잠긴 깊이 보기', 'Locked deep dive') + '</b><p>' + LN('가장 궁금한 한 가지를 눌러 주세요. 눌러 주신 순서대로 먼저 만들어요.', 'Tap the one you want most. We build the most tapped first.') + '</p>';
+    items.forEach(function (q, i) { h += '<button class="btn ghost" data-act="deep" data-v="' + i + '" style="text-align:left;font-weight:900;border:3px solid #000">🔒 ' + esc(LN(q, ['Why this type goes quiet suddenly', 'Your top 3 matching types', 'What changes when you retake in 3 months'][i])) + '</button>'; });
+    return h + '</div>';
+  }
+
   function vFoot() {
     return '<div class="fl">' + logoSvg(46) + '<b><small>KOREA BRAIN MATCHING INSTITUTE</small>한국뇌궁합연구소</b></div>' +
       '<b class="y">한국뇌심리연구소 브랜드 계열 서비스</b><br>' +
@@ -1631,6 +1681,10 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
       track('pwa_install_click');
       if (DEFERRED) { try { DEFERRED.prompt(); } catch (eI) { } DEFERRED = null; } else { toast(LN('위 순서대로 눌러 주세요', 'Please follow the steps above', '上の手順でタップしてください', { ru: 'Следуйте шагам выше', uz: 'Yuqoridagi qadamlarga amal qiling' })); }
       return;
+    } else if (a === 'braincard') {
+      makeBrainCard(); return;
+    } else if (a === 'deep') {
+      track('interest_click', { k: 'deep', i: +v }); toast(LN('곧 열려요! 눌러 주셔서 고마워요', 'Coming soon! Thanks for tapping')); return;
     } else if (a === 'card') {
       makeCard(); return;
     } else if (a === 'share') {
