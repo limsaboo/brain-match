@@ -1756,6 +1756,31 @@ a.btn{text-decoration:none;display:flex;align-items:center;justify-content:cente
   readHash();
   render();
   statBoot();
+  /* ===== 유료 전환 사전 공지 팝업 =====
+     PAID.from 에 'YYYY-MM-DD' 를 넣으면 그날 이전까지 앱을 열 때 한 번(닫으면 같은 폰에서는 다시 안 뜸) 공지가 뜹니다.
+     비워 두면(기본) 아무것도 뜨지 않습니다. 시험: 주소 뒤에 ?paidtest=2026-12-01 */
+  var PAID = { from: '', free: '기본 뇌궁합(그림 30장·레이더·결과 보고서)은 계속 무료예요.', paid: '잠긴 깊이 보기 같은 심화 기능은 유료로 열립니다.' };
+  function paidNotice() {
+    try {
+      var m = /[?&]paidtest=(\d{4}-\d{2}-\d{2})/.exec(location.search || ''), from = m ? m[1] : PAID.from, key, d, today, left, el;
+      if (!from) { return; }
+      key = 'kbm_paid_notice_' + from;
+      if (!m) { try { if (localStorage.getItem(key) === '1') { return; } } catch (e0) { } }
+      d = from.split('-'); today = new Date(); today.setHours(0, 0, 0, 0);
+      left = Math.round((new Date(+d[0], +d[1] - 1, +d[2]) - today) / 86400000);
+      if (left < 0) { return; }
+      el = document.createElement('div');
+      el.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.72);z-index:99;display:flex;align-items:center;justify-content:center;padding:20px';
+      el.innerHTML = '<div style="background:#FFD400;color:#000;border:4px solid #000;border-radius:20px;max-width:420px;width:100%;padding:26px 22px;text-align:center;line-height:1.9;font-weight:900">' +
+        '<div style="font-size:24px">📢 안내</div>' +
+        '<div style="font-size:20px;margin-top:8px">' + (left === 0 ? '오늘부터' : left === 1 ? '내일부터' : (+d[1]) + '월 ' + (+d[2]) + '일부터') + ' 일부 기능이 유료로 바뀝니다</div>' +
+        '<div style="font-size:17px;margin-top:10px;background:#fff;border:3px solid #000;border-radius:14px;padding:10px">' + PAID.free + '<br>' + PAID.paid + '</div>' +
+        '<button type="button" style="margin-top:16px;width:100%;font-size:20px;font-weight:900;padding:14px;border:3px solid #000;border-radius:14px;background:#E60012;color:#fff">확인했어요</button></div>';
+      el.querySelector('button').addEventListener('click', function () { try { localStorage.setItem(key, '1'); } catch (e1) { } if (el.parentNode) { el.parentNode.removeChild(el); } });
+      document.body.appendChild(el);
+    } catch (eP) { }
+  }
+  paidNotice();
   try { if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) { navigator.serviceWorker.register('sw.js').catch(function () { }); } } catch (eW) { }
 
   window.__KB = { T: T, EN: EN, getLang: function () { return LANG; }, HUBS: HUBS, LV: LV, RATE: RATE, KIND: KIND, SEEN: function () { return SEEN; }, resetSeen: function () { SEEN = { clock: 0, last: {} }; }, newDeck: newDeck, HUBKEYS: HUBKEYS, TERM: TERM, regionSvg: regionSvg, IMG: IMG, BAN: BAN, AX: AX, MO: MO, TYPES: TYPES, REFS: REFS, AGES: AGES, NORMS: NORMS, MIN_N: MIN_N, questionsFor: questionsFor, scoreOf: scoreOf, rawOf: rawOf, pctOf: pctOf, refInfo: refInfo,
