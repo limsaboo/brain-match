@@ -270,7 +270,7 @@ select.txt{width:100%;min-height:54px;border:4px solid var(--blue);border-radius
 .kk{background:#FEE500;color:#000;border:3px solid #000}
 a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center}
 .more p{font-weight:900;color:#000;line-height:1.8}
-html[lang="ko"] .top .nm{flex:1 1 auto;min-width:0}html[lang="ko"] .top .nt{display:block;white-space:nowrap;text-wrap:nowrap;word-break:keep-all;font-size:14px;letter-spacing:-.4px;line-height:1.35}</style>
+html[lang="ko"] .top .nm{flex:1 1 auto;min-width:0}html[lang="ko"] .top .nt{display:block;white-space:nowrap;text-wrap:nowrap;word-break:keep-all;font-size:14px;letter-spacing:-.4px;line-height:1.35}.card.num p{padding-left:1.6em}.card.num p::first-letter{float:left;width:1.6em;margin-left:-1.6em}.steps{display:grid;grid-template-columns:1fr 1fr;gap:8px}.steps li{font-size:15px;white-space:nowrap}html .three>div>span{white-space:nowrap;text-wrap:nowrap;font-size:13px;letter-spacing:-.4px}html .ages{grid-template-columns:repeat(3,1fr)}html .ages button{white-space:nowrap;text-wrap:nowrap}html[lang="ko"] p{text-wrap:pretty;word-break:keep-all}html[lang="ko"] body{word-break:keep-all;overflow-wrap:break-word}html[lang="ko"] li,html[lang="ko"] .sayb,html[lang="ko"] .fact{text-wrap:pretty}html .fact .fr{display:block}html .fact .fr .fi{width:112px;margin:0 auto 8px}html .fact .fr .ft{font-size:15px;line-height:1.75}html .sec .sec{padding-left:0;padding-right:0}html [data-act="saveimg"]{margin-bottom:14px}</style>
 </head>
 <body>
 <div id="wrap">
@@ -560,8 +560,8 @@ html[lang="ko"] .top .nm{flex:1 1 auto;min-width:0}html[lang="ko"] .top .nt{disp
       h += '<li>Related function: <span class="e">' + esc(t.fn[1]) + '</span></li></ul>';
       return h;
     }
-    t.parts.forEach(function (p) { h += '<li>' + esc(p[0]) + ' · <span class="e">' + esc(p[1]) + '</span></li>'; });
-    h += '<li>관련 기능: ' + esc(t.fn[0]) + ' · <span class="e">' + esc(t.fn[1]) + '</span></li></ul>';
+    t.parts.forEach(function (p) { h += '<li>' + esc(p[0]) + '<br><span class="e">' + esc(p[1]) + '</span></li>'; });
+    h += '<li>관련 기능: ' + esc(t.fn[0]) + '<br><span class="e">' + esc(t.fn[1]) + '</span></li></ul>';
     return h;
   }
 
@@ -980,7 +980,7 @@ html[lang="ko"] .top .nm{flex:1 1 auto;min-width:0}html[lang="ko"] .top .nt{disp
     h += '<div class="sec"><h2>왜 글이 아니라 그림일까요?</h2>' +
       '<p class="sub">한국뇌심리연구소의 BIPS 개발 원칙(그림 투사·이미지 기반 자기이해)을 적용했습니다.</p>' +
       '<div class="samples s4">' + cardSvg(2, 0, 0, 0) + cardSvg(1, 0, 1, 1) + cardSvg(4, 0, 2, 0) + cardSvg(3, 0, 3, 1) + '</div>' +
-      '<div class="card c1"><p>① 글 읽기 부담이 줄어 <b style="color:#E00000">바로 떠오르는 느낌</b>대로 답하기 쉽도록 설계했습니다.</p><p>② 정답이 있는 문제처럼 보이지 않아 <b style="color:#E00000">편하게 점수</b>를 주도록 돕는 것을 목표로 합니다.</p><p>③ 그림에 점수를 주는 방식이라 연령에 상관없이 같은 방식으로 해 볼 수 있습니다.</p></div></div>';
+      '<div class="card c1 num"><p>① 글 읽기 부담이 줄어 <b style="color:#E00000">바로 떠오르는 느낌</b>대로 답하기 쉽도록 설계했습니다.</p><p>② 정답이 있는 문제처럼 보이지 않아 <b style="color:#E00000">편하게 점수</b>를 주도록 돕는 것을 목표로 합니다.</p><p>③ 그림에 점수를 주는 방식이라 연령에 상관없이 같은 방식으로 해 볼 수 있습니다.</p></div></div>';
 
     h += '<div class="sec"><h2>5가지 뇌 기능 영역</h2><p class="sub">각 영역에 관여하는 것으로 알려진 뇌 부위를 빌려 성향을 설명합니다.</p>';
     for (k = 0; k < 5; k++) {
