@@ -127,6 +127,8 @@ html[lang="ja"] body{font-family:'Noto Sans JP','Hiragino Sans','Hiragino Kaku G
 .card b.t{display:block;font-size:20px;color:var(--blue);font-weight:900;line-height:1.5}
 .card p{color:#000;margin-top:4px}
 .card.c1{border-top:10px solid var(--blue)}.card.c2{border-top:10px solid var(--red)}.card.c3{border-top:10px solid var(--orange)}.card.c4{border-top:10px solid var(--green)}.card.c5{border-top:10px solid var(--purple)}.card.cy{border-top:10px solid var(--yellow)}
+#group .card b.t,#hubs .card b.t,#group .card>p,#hubs .card>p,.card.ctr p{text-align:center;text-wrap:balance}
+#group .card b.t,#hubs .card b.t{margin-bottom:2px}
 .btn{display:block;width:100%;min-height:56px;border:0;border-radius:14px;padding:12px 14px;margin:10px 0 0;font-family:inherit;font-size:18px;font-weight:900;line-height:1.5;text-align:center;cursor:pointer;color:#fff}
 .btn.red{background:var(--red)}.btn.blue{background:var(--blue)}.btn.green{background:var(--green)}.btn.yellow{background:var(--yellow);color:#000}
 .btn.ghost{background:#fff;color:var(--blue);border:3px solid var(--blue)}
@@ -995,7 +997,7 @@ html[lang="ko"] .top .nm{flex:1 1 auto;min-width:0}html[lang="ko"] .top .nt{disp
       '<div class="card c1"><b class="t">나의 뇌 성향 점수 레이더 (예시)</b>' + radarSvg([{ v: [72, 88, 45, 20, 60], col: '#0033CC', fill: 'rgba(255,212,0,.5)' }, { v: [50, 50, 50, 50, 50], col: '#111', fill: 'none', dash: true }], true, ['나', '평균']) + '<p style="font-size:15px">실선은 나, 점선은 연령대 평균입니다.</p></div></div>';
 
     h += '<div class="sec"><div class="card c1"><b class="t">' + LN('익명 통계', 'Anonymous statistics', '匿名統計', { ru: 'Анонимная статистика', uz: 'Anonim statistika' }) + ': ' + (ST.on ? LN('켜짐', 'On', 'オン', { ru: 'Вкл', uz: 'Yoqilgan' }) : LN('꺼짐', 'Off', 'オフ', { ru: 'Выкл', uz: 'O‘chiq' })) + '</b><button class="btn ghost" data-act="stat_toggle">' + LN('바꾸기', 'Change', '切り替える', { ru: 'Изменить', uz: 'O‘zgartirish' }) + '</button></div></div>';
-    h += '<div class="sec"><h2>한국뇌심리연구소와 함께</h2><div class="card c1"><p>한국뇌궁합연구소는 그림 투사 기반 자기이해 시스템을 개발해 온 <b>한국뇌심리연구소</b>의 개발 원칙을 따르는 같은 브랜드 계열 서비스입니다.</p>' +
+    h += '<div class="sec"><h2>한국뇌심리연구소와 함께</h2><div class="card c1 ctr"><p>한국뇌궁합연구소는 그림 투사 기반 자기이해 시스템을 개발해 온 <b>한국뇌심리연구소</b>의 개발 원칙을 따르는 같은 브랜드 계열 서비스입니다.</p>' +
       '<p style="margin-top:8px"><a href="https://k-brain.co.kr" target="_blank" rel="noopener">k-brain.co.kr 바로가기</a></p></div></div>';
 
     h += '<div class="sec"><h2>자주 묻는 질문</h2><div class="card faq">' +
