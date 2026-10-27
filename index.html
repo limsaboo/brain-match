@@ -1619,6 +1619,7 @@ var QRM = ["111111100011101000000110001111111", "1000001010100110010001000010000
   window.addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); DEFERRED = ev; try { var pb = document.getElementById('pwabtn'); if (pb) { pb.style.display = 'block'; } } catch (eP) { } });
   function isStandalone() { try { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; } catch (eS) { return false; } }
   function installCard() {
+    return '';
     if (isStandalone()) { return ''; }
     return '<div class="sec"><h2>' + LN('폰에 앱처럼 설치하기', 'Add it to your phone like an app', 'スマホにアプリとして追加', { ru: 'Добавить на телефон как приложение', uz: 'Telefonga ilova kabi qo‘shish' }) + '</h2>' +
       '<div class="card c1"><ul class="ins">' +
