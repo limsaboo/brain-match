@@ -127,7 +127,7 @@ html[lang="ja"] body{font-family:'Noto Sans JP','Hiragino Sans','Hiragino Kaku G
 .card b.t{display:block;font-size:20px;color:var(--blue);font-weight:900;line-height:1.5}
 .card p{color:#000;margin-top:4px}
 .card.c1{border-top:10px solid var(--blue)}.card.c2{border-top:10px solid var(--red)}.card.c3{border-top:10px solid var(--orange)}.card.c4{border-top:10px solid var(--green)}.card.c5{border-top:10px solid var(--purple)}.card.cy{border-top:10px solid var(--yellow)}
-#group .card b.t,#hubs .card b.t,#group .card>p,#hubs .card>p,.card.ctr p{text-align:center;text-wrap:balance}
+#group .card b.t,#hubs .card b.t,#group .card>p,#hubs .card>p,.card.ctr p,.note.ctr{text-align:center;text-wrap:balance}
 #group .card b.t,#hubs .card b.t{margin-bottom:2px}
 .btn{display:block;width:100%;min-height:56px;border:0;border-radius:14px;padding:12px 14px;margin:10px 0 0;font-family:inherit;font-size:18px;font-weight:900;line-height:1.5;text-align:center;cursor:pointer;color:#fff}
 .btn.red{background:var(--red)}.btn.blue{background:var(--blue)}.btn.green{background:var(--green)}.btn.yellow{background:var(--yellow);color:#000}
@@ -1008,7 +1008,7 @@ html[lang="ko"] .top .nm{flex:1 1 auto;min-width:0}html[lang="ko"] .top .nt{disp
       '<details style="margin-top:8px"><summary>만 18세 미만도 할 수 있나요?</summary><p>만 18세 미만은 보호자(법정대리인)의 동의를 받고, 보호자와 함께 이용해 주세요. 별명에 실명이 들어가지 않도록 보호자가 안내해 주세요.</p></details>' +
       '<details style="margin-top:8px"><summary>뇌를 직접 측정하나요?</summary><p>아닙니다. 그림 선택 경향을 뇌 기능 설명에 빗대어 보여 주는 도구이며, 뇌 활동을 측정하지 않습니다.</p></details></div></div>';
 
-    h += '<div class="sec"><h2>서비스 원칙</h2><div class="note">누가 맞고 틀렸는지 판정하지 않습니다. 사람을 낙인찍거나 우열을 가리지 않고, 서로 다른 성향을 발견하고 대화하도록 돕습니다.</div></div>';
+    h += '<div class="sec"><h2>서비스 원칙</h2><div class="note ctr">누가 맞고 틀렸는지 판정하지 않습니다. 사람을 낙인찍거나 우열을 가리지 않고, 서로 다른 성향을 발견하고 대화하도록 돕습니다.</div></div>';
     return h;
   }
 
