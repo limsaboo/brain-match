@@ -1563,7 +1563,7 @@ var QRM = ["111111100011101000000110001111111", "1000001010100110010001000010000
   function deepCard(t) {
     var items = ['「' + t.name + '」가 갑자기 말이 없어지는 순간', '나와 가장 잘 맞는 유형 TOP 3', '3개월 뒤 다시 하면 달라지는 점'], h = '<div class="card cy"><b class="t">🔒 ' + LN('잠긴 깊이 보기', 'Locked deep dive') + '</b><p>' + LN('가장 궁금한 한 가지를 눌러 주세요. 눌러 주신 순서대로 먼저 만들어요.', 'Tap the one you want most. We build the most tapped first.') + '</p>';
     var pv = (LANG === 'ko' && DEEP[t.name]) || null;
-    items.forEach(function (q, i) { h += '<button class="btn ghost" data-act="deep" data-v="' + i + '" style="text-align:left;font-weight:900;border:3px solid #000;line-height:1.7"><span style="display:flex;gap:8px;align-items:flex-start"><span>🔒</span><span>' + esc(LN(q, ['Why this type goes quiet suddenly', 'Your top 3 matching types', 'What changes when you retake in 3 months'][i])) + '</span></span>' + (pv ? '<span style="display:block;font-weight:700;font-size:.92em;color:#333;margin-top:6px">미리보기 · ' + esc(pv[i]) + ' <b style="color:#E60012">…더 보기</b></span>' : '') + '</button>'; });
+    items.forEach(function (q, i) { h += '<button class="btn ghost" data-act="deep" data-v="' + i + '" style="text-align:left;font-weight:900;border:3px solid #000;line-height:1.7"><span style="display:flex;gap:8px;align-items:flex-start"><span>🔒</span><span>' + esc(LN(q, ['Why this type goes quiet suddenly', 'Your top 3 matching types', 'What changes when you retake in 3 months'][i])) + '</span></span>' + (pv ? '<span style="display:block;font-weight:700;font-size:.92em;color:#333;margin-top:6px">미리보기 · ' + esc(pv[i]) + ' <b style="color:#E60012">🔒 곧 열려요 · 궁금해요 누르기</b></span>' : '') + '</button>'; });
     return h + '</div>';
   }
 
@@ -1588,11 +1588,11 @@ var QRM = ["111111100011101000000110001111111", "1000001010100110010001000010000
     if (typeof window.scrollTo === 'function') { try { window.scrollTo(0, 0); } catch (e) { } }
   }
 
-  function toast(msg) {
+  function toast(msg, ms) {
     var t = document.getElementById('toast');
     if (!t) { return; }
     t.textContent = T(msg); t.style.display = 'block';
-    clearTimeout(toast._t); toast._t = setTimeout(function () { t.style.display = 'none'; }, 2200);
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.style.display = 'none'; }, ms || 2200);
   }
   function copyText(txt) {
     function fb() {
@@ -1732,7 +1732,16 @@ var QRM = ["111111100011101000000110001111111", "1000001010100110010001000010000
     } else if (a === 'braincard') {
       makeBrainCard(); return;
     } else if (a === 'deep') {
-      track('interest_click', { k: 'deep', i: +v }); toast(LN('곧 열려요! 눌러 주셔서 고마워요', 'Coming soon! Thanks for tapping')); return;
+      var dbt = document.querySelector('[data-act="deep"][data-v="' + v + '"]');
+      if (dbt && !dbt.getAttribute('data-done')) {
+        dbt.setAttribute('data-done', '1'); dbt.style.background = '#FFF3B0';
+        var dsp = document.createElement('span');
+        dsp.style.cssText = 'display:block;font-weight:900;color:#006B2B;margin-top:8px';
+        dsp.textContent = LN('✔ 신청됐어요 · 눌러 주신 순서대로 만들어요', '✔ Requested · built in tap order');
+        dbt.appendChild(dsp);
+        track('interest_click', { k: 'deep', i: +v });
+      }
+      toast(LN('곧 열려요! 눌러 주셔서 고마워요', 'Coming soon! Thanks for tapping'), 4200); return;
     } else if (a === 'card') {
       makeCard(); return;
     } else if (a === 'share') {
